@@ -1,0 +1,73 @@
+###################################
+#### PRÁCTICO 10 - EJERCICIO 1 ####
+###################################
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 10 - Modelos dinámicos\intdef.gdt"
+
+#### SE PIDE 1 ####
+
+ploti3 <- gnuplot i3 --with-lines --time-series
+ploti3.show
+
+plotinf <- gnuplot inf --with-lines --time-series
+plotinf.show
+
+#### SE PIDE 2 ####
+
+M1 <- ols i3 const inf
+
+#### SE PIDE 3 ####
+
+genr r1=$uhat
+genr i3hat=$yhat
+
+plotr1 <- gnuplot r1 --time-series --with-lines
+plotr1.show
+
+plot1 <- gnuplot i3 i3hat --time-series --with-lines
+plot1.show
+
+corrgm r1 24 --plot=display
+
+#### SE PIDE 4 ####
+
+M2 <- ols i3 const inf --robust
+
+#### SE PIDE 5 ####
+
+M3 <- ar1 i3 const inf
+
+genr r3=$uhat
+genr i3hat3=$yhat
+
+plot2 <- gnuplot r3 --time-series --with-lines
+plot2.show
+
+plot3 <- gnuplot i3 i3hat3 --time-series --with-lines
+plot3.show
+
+#### SE PIDE 6 ####
+
+M1d <- ols i3 const inf inf(-1) inf(-2)
+
+genr r1d=$uhat
+
+corrgm r1d --plot=display
+
+#### SE PIDE 7 ####
+
+M2d <- ols i3 const inf i3(-1)
+
+genr r2d=$uhat
+
+corrgm r2d --plot=display
+
+scalar z=critical(n, 0.025)
+
+#### SE PIDE 8 ####
+
+M3 <- ols i3 const inf i3(-1) # Es igual al M2d
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

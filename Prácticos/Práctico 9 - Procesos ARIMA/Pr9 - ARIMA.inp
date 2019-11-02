@@ -1,0 +1,78 @@
+# Log started 2012-07-05 15:47
+# Record of session commands.  Please note that this will
+# likely require editing if it is to be run as a script.
+nulldata 300
+setobs 1 1950 --time-series
+genr RBG = randgen(N,0,4)
+genr X=RBG
+genr X=X(-1)+0.7*X(-1)-0.7*X(-2)+RBG
+gnuplot X --with-lines --time-series
+corrgm X 24
+diff X
+gnuplot d_X --with-lines --time-series
+corrgm d_X 24
+genr Z=RBG
+genr Z=Z(-1)+0.7*RBG(-1)+RBG
+gnuplot Z --with-lines --time-series
+diff Z
+gnuplot d_Z --with-lines --time-series
+corrgm d_Z 24
+genr Y3=RBG
+
+# media=phi/(1-0.7)=1-->phi=0.3
+genr Y3=0.3+0.7*RBG(-1)+RBG+0.7*Y3(-1)
+gnuplot Y3 --time-series --with-lines
+
+## Ejercicio 2
+
+open "C:\Documents and Settings\rlabuonora\Escritorio\PIB_1900_2010.xls"
+setobs 1 1900 --time-series
+delete 1
+logs PIB
+diff l_PIB
+gnuplot l_PIB PIB --with-lines --time-series
+corrgm l_PIB 20
+
+# Estimación de ARIMA(1,1,1) para la serie en niveles.
+
+arima 1 1 1 ; 2
+
+#La descartamos porque los coeficientes no son significativos
+
+# Estimación de ARIMA(0,1,1) para la serie en niveles.
+
+arima 0 1 1 ; 2
+
+# Los coeficientes son significativos por lo que guardamos
+# los criterios de información
+
+MA1AIC = $aic
+MA1BIC = $bic
+MA1HQC = $hqc
+
+
+# Estimación de ARIMA(1,1,0) para la serie en niveles.
+
+arima 1 1 0 ; 2
+
+AR1AIC = $aic
+AR1BIC = $bic
+AR1HQC = $hqc
+
+
+#El BIC del ARIMA(1,1,0) es menor por lo que me quedo
+# con el AR1 por este críterio
+MA1BIC 
+AR1BIC 
+
+#El AIC del ARIMA(1,1,0) es menor por lo que me quedo
+# con el AR1 por este críterio
+MA1AIC
+AR1AIC
+
+#El HQC del ARIMA(1,1,0) es menor por lo que me quedo
+# con el AR1 por este críterio
+MA1HQC 
+AR1HQC
+
+

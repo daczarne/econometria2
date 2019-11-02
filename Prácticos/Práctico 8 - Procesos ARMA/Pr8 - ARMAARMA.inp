@@ -1,0 +1,122 @@
+#Ejercicio 1
+#Generar un nuevo conjunto de datos en Gretl con tamaño de muestra igual a
+#300, frecuencia de las series anual, cuya observación inicial corresponda a 1711.
+
+nulldata 300
+setobs 1 1711 --time-series
+
+#Crear una variable ruido blanco con varianza unitaria. 
+#Nombre de la variable: BLANCO.
+
+genr BLANCO = randgen(N,0,1)
+
+#Obtenga su gráfico
+
+
+gnuplot BLANCO --with-lines --time-series
+
+#Obtenga su correlograma
+
+corrgm BLANCO 24
+
+#Ejercicio 2
+
+#Obtenga una serie temporal “X1” de tamaño 299 generada por un proceso
+#MA(1) con esperanza igual a 2 y θ = −0,7
+
+genr X1=BLANCO+0.7*BLANCO(-1)
+
+#Obtenga su correlograma
+
+corrgm X1 24
+
+#Obtenga una serie temporal “X2” de tamaño 299 generada por un proceso
+#MA(1) con esperanza igual 2 y θ = 0,7 . 
+
+genr X2=BLANCO-0.7*BLANCO(-1)
+
+#Obtenga su correlograma 
+corrgm X2 24
+
+# Suponga que desconoce los parámetros de los procesos generadores de X1. Estímelos
+arima 0 0 1 ; 3
+#Acá va el IC
+
+
+# Suponga que desconoce los parámetros de los procesos generadores de X2. Estímelos
+arima 0 0 1 ; 4
+
+
+#Ejercicio 3
+#Obtenga una serie temporal Y1 de tamaño 299 generada por un proceso
+#AR(1) con media cero y φ = 0,9 
+
+#Antes creamos Y1 con cualquier cosa para que tenga Y(-1) cuando lo necesita
+genr Y1=BLANCO
+genr Y1=0.9*Y1(-1)+BLANCO
+
+#Obtenga su correlograma 
+
+corrgm Y1 24
+#Obtenga una serie temporal Y2 de tamaño 299 generada por un proceso
+#AR(1) con media cero y φ = −0,9
+
+genr Y2=BLANCO
+genr Y2=-0.9*Y2(-1)+BLANCO
+
+#Obtenga su correlograma
+
+corrgm Y2 24
+
+#Obtenga una serie temporal Y3 de tamaño 299 generada por un proceso
+#AR(1) con media cero y φ1 = 0,5 
+
+
+genr Y3=BLANCO
+genr Y3=0.5*Y3(-1)+BLANCO
+
+#Obtenga su correlograma
+
+corrgm Y3 24
+# Suponga que desconociera los parámetros del proceso generador 
+#de datos de Y3. Estímelos
+
+
+arima 1 0 0 ; 7
+
+#Genere una serie temporal Y4 de tamaño 299 generada por un proceso AR(1)
+#con media igual a 2 y φ = 0,5
+
+genr Y4=BLANCO
+genr Y4=1+0.5*Y4(-1)+BLANCO
+#Obtenga su correlograma
+corrgm Y4 24
+
+#Ejercicio 4
+#Obtenga una serie temporal de tamaño 299 generada por un proceso
+#ARIMA(1,1,0) con parámetro autorregresivo 0,7 y media 0
+
+genr Y5=BLANCO
+genr Y5=Y5(-1)+0.7*Y5(-1)-0.7*Y5(-2)+BLANCO
+
+#Obtenga su correlograma
+corrgm Y5 24
+#¿Presenta comportamiento tendencial?
+
+gnuplot Y5 --with-lines --time-series
+
+#Diferencie la serie y analice su comportamiento
+
+diff Y5
+gnuplot d_Y5 --with-lines --time-series
+corrgm d_Y5 24
+
+genr Y6=BLANCO
+genr Y6=Y6(-1)-0.7*BLANCO+BLANCO
+gnuplot Y6 --with-lines --time-series
+diff Y6
+gnuplot d_Y6 --with-lines --time-series
+corrgm d_Y6 24
+corrgm Y6 24
+
+

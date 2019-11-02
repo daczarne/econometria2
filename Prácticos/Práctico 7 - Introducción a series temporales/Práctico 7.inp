@@ -1,0 +1,100 @@
+##################################
+#### PRÁCTICO 7 - EJERCICIO 1 ####
+##################################
+
+
+#### Parte 1 ####
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 7 - Introducción a series temporales\PIB.gdt"
+
+#### Parte 2 ####
+
+PIB_plot <- gnuplot PIB --with-lines --time-series
+PIB_plot.show
+
+# Comentario: la serie presenta una tendencia creciente
+
+genr lPIB=log(PIB)
+
+lPIB_plot <- gnuplot lPIB --with-lines --time-series
+lPIB_plot.show
+
+# Comentario: la serie presenta una tendencia creciente. Varianza más estable que en PIB
+
+#### Parte 3 ####
+
+genr time # Genera la variable tendencia lineal
+
+M1 <- ols lPIB const time # Regresa el lPIB contra una constante y el tiempo
+
+series lPIB_detrended = $uhat # Guarda los residuos
+
+# a) Interpretación: beta1 es la tasa de crecimiento promedio anual (esto se debe a que la variable está en logaritmos)
+# b) gráficos
+
+series lPIB_hat = $yhat # Guarda los valores estimados
+
+lPIBs_plot <- gnuplot lPIB lPIB_hat --with-lines --time-series
+lPIBs_plot.show
+
+lPIB_det_plot <- gnuplot lPIB_detrended --with-lines --time-series
+lPIB_det_plot.show
+
+#### Parte 4 ####
+
+M2 <- ols lPIB_detrended const lPIB_detrended(-1)
+
+scalar phi=$coeff(lPIB_detrended_1)
+
+# phi = 0.903545
+
+#### Parte 5 ####
+
+square lPIB_detrended
+genr suma=lPIB_detrended-lPIB_detrended(-1)
+square suma
+scalar DW=sum(sq_suma)*sum(sq_lPIB_detrended)^-1
+
+scalar dw=2*(1-phi) # Cálculo aproximado
+
+scalar DW=$dwpval # Cálculo del p-valor (ni idea cómo se usa)
+
+#### Parte 6 ####
+
+diff lPIB
+
+# a) gráfico
+
+dlPIB_plot <- gnuplot d_lPIB --with-lines --time-series
+dlPIB_plot.show
+
+#### Parte 7 ####
+
+M3 <- ols d_lPIB const
+
+# b) gráfico
+
+series constante=$yhat
+
+constante_plot <- gnuplot d_lPIB constante --with-lines --time-series
+constante_plot.show
+
+# c) residuos
+
+series residuos=$uhat
+
+residuos_plot <- gnuplot residuos --with-lines --time-series
+residuos_plot.show
+
+# d) correlación serial de los residuos
+
+scalar DW=$dwpval
+
+#### Parte 8 ####
+
+M4 <- ols d_lPIB const d_lPIB(-1)
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################
+

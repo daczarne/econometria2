@@ -1,0 +1,106 @@
+##################################
+#### PRÁCTICO 9 - EJERCICIO 2 ####
+##################################
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 9 - Procesos ARIMA\PIB_1900_2015.xls"
+setobs 1 1900 --time-series
+delete 1
+
+#### PARTE 1 ####
+
+plotPIB <- gnuplot PIB --with-lines --time-series
+plotPIB.show
+
+corrgm PIB 20 --plot=display
+
+# El análisis gráfico sugiere una tendencia estocástica y una varianza no constante
+
+logs PIB
+
+plotlPIB <- gnuplot l_PIB --with-lines --time-series
+plotlPIB.show
+
+corrgm l_PIB 20 --plot=display
+
+# La transformación logarítmica corrige (al menos en parte) el problema de varianza
+
+diff l_PIB
+
+plotdlPIB <- gnuplot d_l_PIB --with-lines --time-series
+plotdlPIB.show
+
+corrgm d_l_PIB 20 --plot=display
+
+# Tomar diferencias vuelve a la serie estacionaria en media
+
+# a) ARIMA(1,1,0)
+
+arima 1 1 0 ; l_PIB # Los coeficientes son significativos. La raiz del polinomio de rezagos está fuera del círculo unitario
+
+AR1AIC = $aic
+AR1BIC = $bic
+AR1HQC = $hqc
+
+genr res1=$uhat
+
+plotres1 <- gnuplot res1 --with-lines --time-series
+plotres1.show # La gráfica evidencia los problemas de varianza de la serie original. No parece tener problemas de estacionariedad
+              # en media
+
+corrgm res1 --plot=display # ACF y PACF propios de un RB (salvo por el lag 8, pero esto puede deberse a que no se modelaron los 
+                            # outliers)
+
+normtest res1 --jbera # Con p-valor casi cero, rechazo hipótesis de normalidad (de nuevo, esto puede deberse a problemas con los 
+                        # outliers, y/o a la no modelización de la varianza)
+
+# b) ARIMA(0,0,1)
+
+arima 0 1 1 ; l_PIB
+
+MA1AIC = $aic
+MA1BIC = $bic
+MA1HQC = $hqc
+
+genr res2=$uhat
+
+plotres2 <- gnuplot res2 --with-lines --time-series
+plotres2.show # Mismas conclusiones que con el AR(1)
+
+corrgm res2 --plot=display # Mismas conclusiones que con el AR(1)
+
+normtest res2 --jbera # No rechazo normalidad
+
+# c) ARIMA(1,0,1)
+
+arima 1 0 1 ; l_PIB
+
+# Se descarta este modelo dado que la raíz de la parte AR es muuuuuuy cercana a 1 (en módulo)
+
+# Sugiero otro modelo: ARIMA(1,1,1)
+
+arima 1 1 1 ; l_PIB
+
+# Las raíces está fuere del círculo unitario, pero los coeficientes son no significativos.
+
+## COMPARACIÓN DE CRITERIOS DE INFORMACIÓN:
+
+MA1BIC 
+AR1BIC 
+
+# MA1BIC < AR1BIC => me quedo con el MA1
+
+MA1AIC
+AR1AIC
+
+# MA1AIC < AR1AIC => me quedo con el MA1
+
+MA1HQC 
+AR1HQC
+
+# MA1HQC < AR1HQC => me quedo con el MA1
+
+# Adicionalmente, el MA(1) fue el único modelo que no rechazo la normalidad de los residuos
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

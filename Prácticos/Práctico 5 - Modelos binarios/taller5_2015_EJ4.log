@@ -1,0 +1,1393 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 5 - Modelos binarios\taller5_2015_EJ4.log
+  log type:  text
+ opened on:   4 May 2016, 11:24:16
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se abre la base MROZ y se ordenan las variables alfabéticamente
+. use "$ruta/CRIME.dta", clear    
+
+. aorder
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Generación de la lista de variables, la variable binaria y el punto de corte en relación a la proporción de unos. 
+. global lista "pcnv avgsen tottime ptime86 inc86 black hispan born60"    
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen arr86 = 0
+
+. replace arr86 = 1 if narr86 > 0
+(755 real changes made)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. egen propunos=mean(arr86)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * DESCRIPCION DE LA BASE Y LAS VARIABLES RELEVANTES
+. 
+. sum
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+      avgsen |      2725    .6322936    3.508031          0       59.2
+       black |      2725    .1611009    .3676915          0          1
+      born60 |      2725    .3625688      .48083          0          1
+       durat |      2725    2.251376    4.607063          0         25
+      hispan |      2725    .2176147    .4126997          0          1
+-------------+--------------------------------------------------------
+       inc86 |      2725    54.96705    66.62721          0        541
+     inc86sq |      2725    7458.933    16361.24          0     292681
+      narr86 |      2725    .4044037    .8590768          0         12
+     nfarr86 |      2725    .2333945    .5810142          0          6
+     nparr86 |      2725    .1255046    .4828473          0          8
+-------------+--------------------------------------------------------
+        pcnv |      2725    .3577872     .395192          0          1
+      pcnvsq |      2725     .284131    .3907343          0          1
+      pt86sq |      2725    3.951193    22.08584          0        144
+     ptime86 |      2725     .387156    1.950051          0         12
+      qemp86 |      2725    2.309028    1.610428          0          4
+-------------+--------------------------------------------------------
+     tottime |      2725    .8387523    4.607019          0       63.4
+       arr86 |      2725    .2770642    .4476306          0          1
+    propunos |      2725    .2770642           0   .2770642   .2770642
+
+. tab arr86
+
+      arr86 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |      1,970       72.29       72.29
+          1 |        755       27.71      100.00
+------------+-----------------------------------
+      Total |      2,725      100.00
+
+. tabstat $lista, by(arr86) s(mean)
+
+Summary statistics: mean
+  by categories of: arr86 
+
+   arr86 |      pcnv    avgsen   tottime   ptime86     inc86     black    hispan    born60
+---------+--------------------------------------------------------------------------------
+       0 |  .3938579  .5964467  .8139086  .4568528  62.62797  .1284264  .2060914  .3680203
+       1 |  .2636689  .7258278  .9035762   .205298  34.97762  .2463576  .2476821  .3483444
+---------+--------------------------------------------------------------------------------
+   Total |  .3577872  .6322936  .8387523   .387156  54.96705  .1611009  .2176147  .3625688
+------------------------------------------------------------------------------------------
+
+. sum propunos
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |      2725    .2770642           0   .2770642   .2770642
+
+. pwcorr $lista,star(0.05)
+
+             |     pcnv   avgsen  tottime  ptime86    inc86    black   hispan
+-------------+---------------------------------------------------------------
+        pcnv |   1.0000 
+      avgsen |   0.0258   1.0000 
+     tottime |   0.0299   0.9285*  1.0000 
+     ptime86 |   0.0539*  0.2353*  0.2821*  1.0000 
+       inc86 |  -0.0089  -0.0958* -0.0997* -0.1600*  1.0000 
+       black |  -0.0661*  0.1194*  0.1138*  0.0737* -0.1470*  1.0000 
+      hispan |   0.0102   0.0128   0.0209   0.0513*  0.0008  -0.2311*  1.0000 
+      born60 |   0.0473*  0.0123   0.0149   0.0065   0.0811*  0.0100  -0.0111 
+
+             |   born60
+-------------+---------
+      born60 |   1.0000 
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. reg arr86 $lista
+
+      Source |       SS       df       MS              Number of obs =    2725
+-------------+------------------------------           F(  8,  2716) =   30.48
+       Model |  44.9720916     8  5.62151145           Prob > F      =  0.0000
+    Residual |  500.844422  2716  .184405163           R-squared     =  0.0824
+-------------+------------------------------           Adj R-squared =  0.0797
+       Total |  545.816514  2724   .20037317           Root MSE      =  .42942
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.1543802   .0209336    -7.37   0.000    -.1954275   -.1133329
+      avgsen |   .0035024   .0063417     0.55   0.581    -.0089326    .0159374
+     tottime |  -.0020613   .0048884    -0.42   0.673    -.0116466     .007524
+     ptime86 |  -.0215953   .0044679    -4.83   0.000    -.0303561   -.0128344
+       inc86 |  -.0012248    .000127    -9.65   0.000    -.0014738   -.0009759
+       black |   .1617183   .0235044     6.88   0.000     .1156299    .2078066
+      hispan |   .0892586   .0205592     4.34   0.000     .0489454    .1295718
+      born60 |   .0028698   .0171986     0.17   0.867    -.0308539    .0365936
+       _cons |   .3609831   .0160927    22.43   0.000      .329428    .3925382
+------------------------------------------------------------------------------
+
+. reg arr86 $lista, robust
+
+Linear regression                                      Number of obs =    2725
+                                                       F(  8,  2716) =   37.59
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.0824
+                                                       Root MSE      =  .42942
+
+------------------------------------------------------------------------------
+             |               Robust
+       arr86 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.1543802    .018964    -8.14   0.000    -.1915656   -.1171948
+      avgsen |   .0035024   .0058876     0.59   0.552    -.0080423    .0150471
+     tottime |  -.0020613   .0042256    -0.49   0.626     -.010347    .0062244
+     ptime86 |  -.0215953   .0027532    -7.84   0.000    -.0269938   -.0161967
+       inc86 |  -.0012248   .0001141   -10.73   0.000    -.0014487    -.001001
+       black |   .1617183   .0255279     6.33   0.000     .1116622    .2117743
+      hispan |   .0892586   .0210689     4.24   0.000     .0479459    .1305714
+      born60 |   .0028698   .0171596     0.17   0.867    -.0307774     .036517
+       _cons |   .3609831   .0167081    21.61   0.000     .3282214    .3937449
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se guardan los valores ajustados en una variable prMPL (predicción de la probabilidad de cada individuo)
+. predict prMPL
+(option xb assumed; fitted values)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Notar que existen estimaciones de probabilidad fuera del intervalo [0,1]
+. count if[prMPL<0]
+   63
+
+. count if[prMPL>1]
+    0
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Predicciones de INLF utilizando como valor de corte la proporción muestral de unos
+. g UNOMPL=(prMPL>propunos)
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab arr86 UNOMPL, col   
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+           |        UNOMPL
+     arr86 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     1,062        908 |     1,970 
+           |     84.42      61.90 |     72.29 
+-----------+----------------------+----------
+         1 |       196        559 |       755 
+           |     15.58      38.10 |     27.71 
+-----------+----------------------+----------
+     Total |     1,258      1,467 |     2,725 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Predicciones de INLF utilizando como valor de corte 0,5
+. g UNOMPL2=(prMPL>0.5)
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab arr86 UNOMPL2, col  
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+           |        UNOMPL2
+     arr86 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |     1,919         51 |     1,970 
+           |     73.36      46.79 |     72.29 
+-----------+----------------------+----------
+         1 |       697         58 |       755 
+           |     26.64      53.21 |     27.71 
+-----------+----------------------+----------
+     Total |     2,616        109 |     2,725 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Efecto de pasar en pcvn de 0.25 a 0.75
+. gen EPpcnv=_b[pcnv]*0.75 - _b[pcnv]*0.25
+
+. sum EPpcnv
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+      EPpcnv |      2725   -.0771901           0  -.0771901  -.0771901
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Prueba conjunta de avgsen y tottime
+. test avgsen tottime
+
+ ( 1)  avgsen = 0
+ ( 2)  tottime = 0
+
+       F(  2,  2716) =    0.18
+            Prob > F =    0.8320
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. reg arr86 $lista, robust
+
+Linear regression                                      Number of obs =    2725
+                                                       F(  8,  2716) =   37.59
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.0824
+                                                       Root MSE      =  .42942
+
+------------------------------------------------------------------------------
+             |               Robust
+       arr86 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.1543802    .018964    -8.14   0.000    -.1915656   -.1171948
+      avgsen |   .0035024   .0058876     0.59   0.552    -.0080423    .0150471
+     tottime |  -.0020613   .0042256    -0.49   0.626     -.010347    .0062244
+     ptime86 |  -.0215953   .0027532    -7.84   0.000    -.0269938   -.0161967
+       inc86 |  -.0012248   .0001141   -10.73   0.000    -.0014487    -.001001
+       black |   .1617183   .0255279     6.33   0.000     .1116622    .2117743
+      hispan |   .0892586   .0210689     4.24   0.000     .0479459    .1305714
+      born60 |   .0028698   .0171596     0.17   0.867    -.0307774     .036517
+       _cons |   .3609831   .0167081    21.61   0.000     .3282214    .3937449
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Prueba conjunta de avgsen y tottime (no robusta)
+. 
+. reg arr86 $lista
+
+      Source |       SS       df       MS              Number of obs =    2725
+-------------+------------------------------           F(  8,  2716) =   30.48
+       Model |  44.9720916     8  5.62151145           Prob > F      =  0.0000
+    Residual |  500.844422  2716  .184405163           R-squared     =  0.0824
+-------------+------------------------------           Adj R-squared =  0.0797
+       Total |  545.816514  2724   .20037317           Root MSE      =  .42942
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.1543802   .0209336    -7.37   0.000    -.1954275   -.1133329
+      avgsen |   .0035024   .0063417     0.55   0.581    -.0089326    .0159374
+     tottime |  -.0020613   .0048884    -0.42   0.673    -.0116466     .007524
+     ptime86 |  -.0215953   .0044679    -4.83   0.000    -.0303561   -.0128344
+       inc86 |  -.0012248    .000127    -9.65   0.000    -.0014738   -.0009759
+       black |   .1617183   .0235044     6.88   0.000     .1156299    .2078066
+      hispan |   .0892586   .0205592     4.34   0.000     .0489454    .1295718
+      born60 |   .0028698   .0171986     0.17   0.867    -.0308539    .0365936
+       _cons |   .3609831   .0160927    22.43   0.000      .329428    .3925382
+------------------------------------------------------------------------------
+
+. test avgsen tottime
+
+ ( 1)  avgsen = 0
+ ( 2)  tottime = 0
+
+       F(  2,  2716) =    0.18
+            Prob > F =    0.8360
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Prueba conjunta de avgsen y tottime (robusta)
+. 
+. reg arr86 $lista, robust
+
+Linear regression                                      Number of obs =    2725
+                                                       F(  8,  2716) =   37.59
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.0824
+                                                       Root MSE      =  .42942
+
+------------------------------------------------------------------------------
+             |               Robust
+       arr86 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.1543802    .018964    -8.14   0.000    -.1915656   -.1171948
+      avgsen |   .0035024   .0058876     0.59   0.552    -.0080423    .0150471
+     tottime |  -.0020613   .0042256    -0.49   0.626     -.010347    .0062244
+     ptime86 |  -.0215953   .0027532    -7.84   0.000    -.0269938   -.0161967
+       inc86 |  -.0012248   .0001141   -10.73   0.000    -.0014487    -.001001
+       black |   .1617183   .0255279     6.33   0.000     .1116622    .2117743
+      hispan |   .0892586   .0210689     4.24   0.000     .0479459    .1305714
+      born60 |   .0028698   .0171596     0.17   0.867    -.0307774     .036517
+       _cons |   .3609831   .0167081    21.61   0.000     .3282214    .3937449
+------------------------------------------------------------------------------
+
+. test avgsen tottime
+
+ ( 1)  avgsen = 0
+ ( 2)  tottime = 0
+
+       F(  2,  2716) =    0.18
+            Prob > F =    0.8320
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. probit arr86 $lista
+
+Iteration 0:   log likelihood = -1608.1837  
+Iteration 1:   log likelihood = -1484.8473  
+Iteration 2:   log likelihood =  -1483.641  
+Iteration 3:   log likelihood = -1483.6406  
+Iteration 4:   log likelihood = -1483.6406  
+
+Probit regression                                 Number of obs   =       2725
+                                                  LR chi2(8)      =     249.09
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -1483.6406                       Pseudo R2       =     0.0774
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.5529248   .0720779    -7.67   0.000    -.6941949   -.4116547
+      avgsen |   .0127395   .0212319     0.60   0.548    -.0288742    .0543532
+     tottime |  -.0076486   .0168844    -0.45   0.651    -.0407415    .0254443
+     ptime86 |  -.0812017   .0179631    -4.52   0.000    -.1164088   -.0459946
+       inc86 |  -.0046346   .0004777    -9.70   0.000    -.0055709   -.0036983
+       black |   .4666076   .0719687     6.48   0.000     .3255515    .6076636
+      hispan |   .2911005   .0654028     4.45   0.000     .1629134    .4192876
+      born60 |   .0112074   .0556843     0.20   0.840    -.0979319    .1203467
+       _cons |   -.313833      .0513    -6.12   0.000    -.4143791    -.213287
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se guardan los valores ajustados en una variable prMPL (predicción de la probabilidad de cada individuo)
+. predict prPROBIT
+(option pr assumed; Pr(arr86))
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Bondad de ajuste 
+. * 1. Valor por defecto de STATA: 0.5
+. estat class
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        78            67  |        145
+     -     |       677          1903  |       2580
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .5
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   10.33%
+Specificity                     Pr( -|~D)   96.60%
+Positive predictive value       Pr( D| +)   53.79%
+Negative predictive value       Pr(~D| -)   73.76%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    3.40%
+False - rate for true D         Pr( -| D)   89.67%
+False + rate for classified +   Pr(~D| +)   46.21%
+False - rate for classified -   Pr( D| -)   26.24%
+--------------------------------------------------
+Correctly classified                        72.70%
+--------------------------------------------------
+
+. * 2. Usando proporción de unos en la muestra
+. sum propunos
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |      2725    .2770642           0   .2770642   .2770642
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos')
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       529           850  |       1379
+     -     |       226          1120  |       1346
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .2770642
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   70.07%
+Specificity                     Pr( -|~D)   56.85%
+Positive predictive value       Pr( D| +)   38.36%
+Negative predictive value       Pr(~D| -)   83.21%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   43.15%
+False - rate for true D         Pr( -| D)   29.93%
+False + rate for classified +   Pr(~D| +)   61.64%
+False - rate for classified -   Pr( D| -)   16.79%
+--------------------------------------------------
+Correctly classified                        60.51%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * EFECTOS PARCIALES
+. * Por defecto son en la media de todas las variables
+. mfx compute
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =  .25667532
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.1781575      .02302   -7.74   0.000  -.223268 -.133047   .357787
+  avgsen |   .0041048      .00684    0.60   0.548  -.009303  .017512   .632294
+ tottime |  -.0024644      .00544   -0.45   0.651  -.013127  .008198   .838752
+ ptime86 |  -.0261639      .00576   -4.54   0.000   -.03746 -.014868   .387156
+   inc86 |  -.0014933      .00015   -9.87   0.000   -.00179 -.001197    54.967
+   black*|   .1635245      .02679    6.10   0.000   .111018  .216031   .161101
+  hispan*|   .0984048      .02299    4.28   0.000   .053338  .143471   .217615
+  born60*|   .0036147      .01798    0.20   0.841  -.031621   .03885   .362569
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Efecto de cambio en pcnv de 0.25 a 0.75
+. mfx compute, at(black=1 hispan=0  born60=1 pcnv=0.75)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =   .2962348
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.1911448      .02279   -8.39   0.000  -.235811 -.146479       .75
+  avgsen |    .004404      .00734    0.60   0.548  -.009981  .018789   .632294
+ tottime |  -.0026441      .00584   -0.45   0.651   -.01409  .008802   .838752
+ ptime86 |  -.0280712      .00635   -4.42   0.000  -.040517 -.015625   .387156
+   inc86 |  -.0016022      .00017   -9.50   0.000  -.001933 -.001272    54.967
+   black*|   .1380312      .02388    5.78   0.000   .091229  .184833         1
+  hispan*|   .1073186      .02552    4.20   0.000   .057291  .157346         0
+  born60*|   .0038627       .0192    0.20   0.841  -.033772  .041497         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. mfx compute, at(black=1 hispan=0 born60=1 pcnv=0.25)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =  .39789544
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.2133204      .02827   -7.54   0.000  -.268736 -.157905       .25
+  avgsen |    .004915      .00819    0.60   0.548  -.011138  .020968   .632294
+ tottime |  -.0029509      .00651   -0.45   0.651   -.01572  .009818   .838752
+ ptime86 |  -.0313279      .00696   -4.50   0.000   -.04497 -.017686   .387156
+   inc86 |  -.0017881      .00018   -9.77   0.000  -.002147 -.001429    54.967
+   black*|   .1637939      .02661    6.16   0.000   .111638   .21595         1
+  hispan*|    .114989      .02611    4.40   0.000   .063823  .166155         0
+  born60*|   .0043175      .02146    0.20   0.841  -.037741  .046376         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Relación entre probabilidad de arresto y pcnv
+. 
+. egen m1= mean(pcnv) 
+
+. egen m2= mean(avgsen) 
+
+. egen m3= mean(tottime) 
+
+. egen m4= mean(ptime86)
+
+. egen m5= mean(inc86)
+
+. 
+. gen gprobit1= normalden(_b[pcnv]*pcnv + _b[avgsen]*m2 + _b[tottime]*m3 + _b[ptime86]*m4 + _b[inc86]*m5 + _b[black] + _b[hispan] + _b[born60] + _b[_cons
+> ])
+
+. gen parcial_p_pcnv= gprobit1*_b[pcnv]
+
+. scatter parcial_p_pcnv pcnv
+
+. 
+. 
+. gen gprobit75= normal(_b[pcnv]*0.75 + _b[avgsen]*m2 + _b[tottime]*m3 + _b[ptime86]*m4 + _b[inc86]*m5 + _b[black]*1  + _b[born60]*1 + _b[_cons])
+
+. gen parcial_p_pcnv75= gprobit75*_b[pcnv]
+
+. gen gprobit25= normal(_b[pcnv]*0.25 + _b[avgsen]*m2 + _b[tottime]*m3 + _b[ptime86]*m4 + _b[inc86]*m5 + _b[black]*1  + _b[born60]*1 + _b[_cons])
+
+. gen parcial_p_pcnv25= gprobit25*_b[pcnv]
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Efecto de cambio en pcnv de 0.25 a 0.75
+. mfx compute, at(black=1 hispan=0  born60=1 pcnv=0.75)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =   .2962348
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.1911448      .02279   -8.39   0.000  -.235811 -.146479       .75
+  avgsen |    .004404      .00734    0.60   0.548  -.009981  .018789   .632294
+ tottime |  -.0026441      .00584   -0.45   0.651   -.01409  .008802   .838752
+ ptime86 |  -.0280712      .00635   -4.42   0.000  -.040517 -.015625   .387156
+   inc86 |  -.0016022      .00017   -9.50   0.000  -.001933 -.001272    54.967
+   black*|   .1380312      .02388    5.78   0.000   .091229  .184833         1
+  hispan*|   .1073186      .02552    4.20   0.000   .057291  .157346         0
+  born60*|   .0038627       .0192    0.20   0.841  -.033772  .041497         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. mfx compute, at(black=1 hispan=0 born60=1 pcnv=0.25)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =  .39789544
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.2133204      .02827   -7.54   0.000  -.268736 -.157905       .25
+  avgsen |    .004915      .00819    0.60   0.548  -.011138  .020968   .632294
+ tottime |  -.0029509      .00651   -0.45   0.651   -.01572  .009818   .838752
+ ptime86 |  -.0313279      .00696   -4.50   0.000   -.04497 -.017686   .387156
+   inc86 |  -.0017881      .00018   -9.77   0.000  -.002147 -.001429    54.967
+   black*|   .1637939      .02661    6.16   0.000   .111638   .21595         1
+  hispan*|    .114989      .02611    4.40   0.000   .063823  .166155         0
+  born60*|   .0043175      .02146    0.20   0.841  -.037741  .046376         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. 
+end of do-file
+
+. help mfx
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. mfx compute, at(black=1 hispan=0  born60=1 pcnv=0.75)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =   .2962348
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.1911448      .02279   -8.39   0.000  -.235811 -.146479       .75
+  avgsen |    .004404      .00734    0.60   0.548  -.009981  .018789   .632294
+ tottime |  -.0026441      .00584   -0.45   0.651   -.01409  .008802   .838752
+ ptime86 |  -.0280712      .00635   -4.42   0.000  -.040517 -.015625   .387156
+   inc86 |  -.0016022      .00017   -9.50   0.000  -.001933 -.001272    54.967
+   black*|   .1380312      .02388    5.78   0.000   .091229  .184833         1
+  hispan*|   .1073186      .02552    4.20   0.000   .057291  .157346         0
+  born60*|   .0038627       .0192    0.20   0.841  -.033772  .041497         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. scalar valor1 = e(Xmfx_y)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar list
+    valor1 =   .2962348
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. mfx compute, at(black=1 hispan=0  born60=1 pcnv=0.75)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =   .2962348
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.1911448      .02279   -8.39   0.000  -.235811 -.146479       .75
+  avgsen |    .004404      .00734    0.60   0.548  -.009981  .018789   .632294
+ tottime |  -.0026441      .00584   -0.45   0.651   -.01409  .008802   .838752
+ ptime86 |  -.0280712      .00635   -4.42   0.000  -.040517 -.015625   .387156
+   inc86 |  -.0016022      .00017   -9.50   0.000  -.001933 -.001272    54.967
+   black*|   .1380312      .02388    5.78   0.000   .091229  .184833         1
+  hispan*|   .1073186      .02552    4.20   0.000   .057291  .157346         0
+  born60*|   .0038627       .0192    0.20   0.841  -.033772  .041497         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. scalar valor1 = e(Xmfx_y)
+
+. mfx compute, at(black=1 hispan=0 born60=1 pcnv=0.25)
+
+warning: no value assigned in at() for variables avgsen tottime ptime86 inc86;
+   means used for avgsen tottime ptime86 inc86
+
+Marginal effects after probit
+      y  = Pr(arr86) (predict)
+         =  .39789544
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    pcnv |  -.2133204      .02827   -7.54   0.000  -.268736 -.157905       .25
+  avgsen |    .004915      .00819    0.60   0.548  -.011138  .020968   .632294
+ tottime |  -.0029509      .00651   -0.45   0.651   -.01572  .009818   .838752
+ ptime86 |  -.0313279      .00696   -4.50   0.000   -.04497 -.017686   .387156
+   inc86 |  -.0017881      .00018   -9.77   0.000  -.002147 -.001429    54.967
+   black*|   .1637939      .02661    6.16   0.000   .111638   .21595         1
+  hispan*|    .114989      .02611    4.40   0.000   .063823  .166155         0
+  born60*|   .0043175      .02146    0.20   0.841  -.037741  .046376         1
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. scalar valor2 = e(Xmfx_y)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar efecto=valor1-valor2
+
+. scalar list
+    efecto = -.10166064
+    valor2 =  .39789544
+    valor1 =   .2962348
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar efecto=valor2-valor1
+
+. scalar list
+    efecto =  .10166064
+    valor2 =  .39789544
+    valor1 =   .2962348
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar efectoMPL = _b[pcnv]*0.75 - _b[pcnv]*0.25
+
+. scalar list
+ efectoMPL =  -.2764624
+    efecto =  .10166064
+    valor2 =  .39789544
+    valor1 =   .2962348
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. display efectoMPL
+-.2764624
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar efectoPROBIT = valor2-valor1
+
+. display efectoMPL efectoPROBIT
+-.2764624.10166064
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar efectoPROBIT = valor2-valor1
+
+. display efectoMPL 
+-.2764624
+
+. display efectoPROBIT
+.10166064
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * BONDAD DE AJUSTE
+. * 1. Valor por defecto de STATA: 0.5
+. estat class
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        78            67  |        145
+     -     |       677          1903  |       2580
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .5
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   10.33%
+Specificity                     Pr( -|~D)   96.60%
+Positive predictive value       Pr( D| +)   53.79%
+Negative predictive value       Pr(~D| -)   73.76%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    3.40%
+False - rate for true D         Pr( -| D)   89.67%
+False + rate for classified +   Pr(~D| +)   46.21%
+False - rate for classified -   Pr( D| -)   26.24%
+--------------------------------------------------
+Correctly classified                        72.70%
+--------------------------------------------------
+
+. * 2. Usando proporción de unos en la muestra
+. sum propunos
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |      2725    .2770642           0   .2770642   .2770642
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos')
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       529           850  |       1379
+     -     |       226          1120  |       1346
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .2770642
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   70.07%
+Specificity                     Pr( -|~D)   56.85%
+Positive predictive value       Pr( D| +)   38.36%
+Negative predictive value       Pr(~D| -)   83.21%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   43.15%
+False - rate for true D         Pr( -| D)   29.93%
+False + rate for classified +   Pr(~D| +)   61.64%
+False - rate for classified -   Pr( D| -)   16.79%
+--------------------------------------------------
+Correctly classified                        60.51%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * BONDAD DE AJUSTE (predicciones correctas sin narr86=0)
+. * 1. Valor por defecto de STATA: 0.5
+. estat class
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |        78            67  |        145
+     -     |       677          1903  |       2580
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .5
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   10.33%
+Specificity                     Pr( -|~D)   96.60%
+Positive predictive value       Pr( D| +)   53.79%
+Negative predictive value       Pr(~D| -)   73.76%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    3.40%
+False - rate for true D         Pr( -| D)   89.67%
+False + rate for classified +   Pr(~D| +)   46.21%
+False - rate for classified -   Pr( D| -)   26.24%
+--------------------------------------------------
+Correctly classified                        72.70%
+--------------------------------------------------
+
+. * 2. Usando proporción de unos en la muestra
+. sum propunos if narr86 == 0
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |      1970    .2770642           0   .2770642   .2770642
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos')
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       529           850  |       1379
+     -     |       226          1120  |       1346
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .2770642
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   70.07%
+Specificity                     Pr( -|~D)   56.85%
+Positive predictive value       Pr( D| +)   38.36%
+Negative predictive value       Pr(~D| -)   83.21%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   43.15%
+False - rate for true D         Pr( -| D)   29.93%
+False + rate for classified +   Pr(~D| +)   61.64%
+False - rate for classified -   Pr( D| -)   16.79%
+--------------------------------------------------
+Correctly classified                        60.51%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * 1. Valor por defecto de STATA: 0.5
+. estat class if nar86 == 0
+nar86 not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. estat class if narr86 == 0
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |         0            67  |         67
+     -     |         0          1903  |       1903
+-----------+--------------------------+-----------
+   Total   |         0          1970  |       1970
+
+Classified + if predicted Pr(D) >= .5
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)       .%
+Specificity                     Pr( -|~D)   96.60%
+Positive predictive value       Pr( D| +)    0.00%
+Negative predictive value       Pr(~D| -)  100.00%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)    3.40%
+False - rate for true D         Pr( -| D)       .%
+False + rate for classified +   Pr(~D| +)  100.00%
+False - rate for classified -   Pr( D| -)    0.00%
+--------------------------------------------------
+Correctly classified                        96.60%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum propunos if narr86 == 0
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |      1970    .2770642           0   .2770642   .2770642
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos') if narr86 == 0
+option if not allowed
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum propunos if narr86 == 0
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |      1970    .2770642           0   .2770642   .2770642
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos')
+
+Probit model for arr86
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       529           850  |       1379
+     -     |       226          1120  |       1346
+-----------+--------------------------+-----------
+   Total   |       755          1970  |       2725
+
+Classified + if predicted Pr(D) >= .2770642
+True D defined as arr86 != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   70.07%
+Specificity                     Pr( -|~D)   56.85%
+Positive predictive value       Pr( D| +)   38.36%
+Negative predictive value       Pr(~D| -)   83.21%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   43.15%
+False - rate for true D         Pr( -| D)   29.93%
+False + rate for classified +   Pr(~D| +)   61.64%
+False - rate for classified -   Pr( D| -)   16.79%
+--------------------------------------------------
+Correctly classified                        60.51%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen pcnv2=pcnv * pcnv
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen inc862 = inc86 * inc 86
+inc ambiguous abbreviation
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen pcnv2 = pcnv * pcnv
+pcnv2 already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen ptime862 = ptime86 * ptime86
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen inc862 = inc86 * inc 86
+inc ambiguous abbreviation
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen inc86_2 = inc86 * inc 86
+inc ambiguous abbreviation
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse inc86sq pcnv86sq ptime86sq
+variable pcnv86sq not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse inc86sq pcnvsq ptime86sq
+variable ptime86sq not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen ptime86sq = ptime86 * ptime86       
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse inc86sq pcnvsq ptime86sq
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse inc86 inc86sq pcnv pcnvsq ptime86 ptime86sq
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Estimo el nuevo probit
+. probit arr86 $lista $lista2
+
+Iteration 0:   log likelihood = -1608.1837  
+Iteration 1:   log likelihood = -1484.8473  
+Iteration 2:   log likelihood =  -1483.641  
+Iteration 3:   log likelihood = -1483.6406  
+Iteration 4:   log likelihood = -1483.6406  
+
+Probit regression                                 Number of obs   =       2725
+                                                  LR chi2(8)      =     249.09
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -1483.6406                       Pseudo R2       =     0.0774
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.5529248   .0720779    -7.67   0.000    -.6941949   -.4116547
+      avgsen |   .0127395   .0212319     0.60   0.548    -.0288742    .0543532
+     tottime |  -.0076486   .0168844    -0.45   0.651    -.0407415    .0254443
+     ptime86 |  -.0812017   .0179631    -4.52   0.000    -.1164088   -.0459946
+       inc86 |  -.0046346   .0004777    -9.70   0.000    -.0055709   -.0036983
+       black |   .4666076   .0719687     6.48   0.000     .3255515    .6076636
+      hispan |   .2911005   .0654028     4.45   0.000     .1629134    .4192876
+      born60 |   .0112074   .0556843     0.20   0.840    -.0979319    .1203467
+       _cons |   -.313833      .0513    -6.12   0.000    -.4143791    -.213287
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. test pcnvsq
+pcnvsq not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. probit arr86 $lista $lista2
+
+Iteration 0:   log likelihood = -1608.1837  
+Iteration 1:   log likelihood = -1484.8473  
+Iteration 2:   log likelihood =  -1483.641  
+Iteration 3:   log likelihood = -1483.6406  
+Iteration 4:   log likelihood = -1483.6406  
+
+Probit regression                                 Number of obs   =       2725
+                                                  LR chi2(8)      =     249.09
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -1483.6406                       Pseudo R2       =     0.0774
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |  -.5529248   .0720779    -7.67   0.000    -.6941949   -.4116547
+      avgsen |   .0127395   .0212319     0.60   0.548    -.0288742    .0543532
+     tottime |  -.0076486   .0168844    -0.45   0.651    -.0407415    .0254443
+     ptime86 |  -.0812017   .0179631    -4.52   0.000    -.1164088   -.0459946
+       inc86 |  -.0046346   .0004777    -9.70   0.000    -.0055709   -.0036983
+       black |   .4666076   .0719687     6.48   0.000     .3255515    .6076636
+      hispan |   .2911005   .0654028     4.45   0.000     .1629134    .4192876
+      born60 |   .0112074   .0556843     0.20   0.840    -.0979319    .1203467
+       _cons |   -.313833      .0513    -6.12   0.000    -.4143791    -.213287
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. probit arr86 $lista2
+
+Iteration 0:   log likelihood = -1608.1837  
+Iteration 1:   log likelihood = -1608.1837  
+
+Probit regression                                 Number of obs   =       2725
+                                                  LR chi2(0)      =      -0.00
+                                                  Prob > chi2     =          .
+Log likelihood = -1608.1837                       Pseudo R2       =    -0.0000
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       _cons |  -.5915851   .0256001   -23.11   0.000    -.6417605   -.5414098
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Genero un nuevo global donde incluyo a las nuevas variables
+. global lista2 "pcnv pcnvsq avgsen tottime ptime86 ptime86sq inc86 inc86sq black hispan born60"  
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Estimo el nuevo probit
+. probit arr86 $lista2
+
+Iteration 0:   log likelihood = -1608.1837  
+Iteration 1:   log likelihood = -1449.7154  
+Iteration 2:   log likelihood = -1442.7484  
+Iteration 3:   log likelihood = -1440.1696  
+Iteration 4:   log likelihood = -1439.8023  
+Iteration 5:   log likelihood = -1439.8005  
+Iteration 6:   log likelihood = -1439.8005  
+
+Probit regression                                 Number of obs   =       2725
+                                                  LR chi2(11)     =     336.77
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -1439.8005                       Pseudo R2       =     0.1047
+
+------------------------------------------------------------------------------
+       arr86 |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        pcnv |   .2167615   .2604937     0.83   0.405    -.2937968    .7273198
+      pcnvsq |  -.8570512   .2714575    -3.16   0.002    -1.389098   -.3250042
+      avgsen |   .0139969   .0244972     0.57   0.568    -.0340166    .0620105
+     tottime |  -.0178158   .0199703    -0.89   0.372     -.056957    .0213253
+     ptime86 |   .7449712   .1438486     5.18   0.000     .4630332    1.026909
+   ptime86sq |  -.1035031   .0224234    -4.62   0.000    -.1474522    -.059554
+       inc86 |  -.0058786   .0009851    -5.97   0.000    -.0078094   -.0039478
+     inc86sq |   8.75e-06   4.28e-06     2.04   0.041     3.63e-07    .0000171
+       black |   .4368131   .0733798     5.95   0.000     .2929913     .580635
+      hispan |   .2663945    .067082     3.97   0.000     .1349163    .3978727
+      born60 |  -.0145223   .0566913    -0.26   0.798    -.1256351    .0965905
+       _cons |   -.337362   .0562665    -6.00   0.000    -.4476423   -.2270817
+------------------------------------------------------------------------------
+Note: 51 failures and 0 successes completely determined.
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. test pcnvsq
+
+ ( 1)  [arr86]pcnvsq = 0
+
+           chi2(  1) =    9.97
+         Prob > chi2 =    0.0016
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. test ptime86sq
+
+ ( 1)  [arr86]ptime86sq = 0
+
+           chi2(  1) =   21.31
+         Prob > chi2 =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. test inc86sq //
+
+ ( 1)  [arr86]inc86sq = 0
+
+           chi2(  1) =    4.18
+         Prob > chi2 =    0.0409
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. test pcnvsq ptime86sq inc86sq
+
+ ( 1)  [arr86]pcnvsq = 0
+ ( 2)  [arr86]ptime86sq = 0
+ ( 3)  [arr86]inc86sq = 0
+
+           chi2(  3) =   38.54
+         Prob > chi2 =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. egen m1= mean(pcnv) 
+m1 already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen gprobit1= normalden(_b[pcnv]*pcnv + _b[avgsen]*m2 + _b[tottime]*m3 + _b[ptime86]*m4 + _b[inc86]*m5 + _b[black] + _b[hispan] + _b[born60] + _b[_cons
+> ])
+gprobit1 already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scatter parcial_p_pcnv pcnv
+
+. 
+end of do-file
+
+. exit, clear

@@ -1,0 +1,148 @@
+##################################
+#### PRÁCTICO 9 - EJERCICIO 3 ####
+##################################
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 9 - Procesos ARIMA\pc_cg_uru.xls"
+setobs 1 1950 --time-series
+delete 1
+
+#### SERIE IPC ####
+
+# Serie en niveles
+
+plotipc <- gnuplot pc --with-lines --time-series
+plotipc.show
+
+corrgm pc 20 --plot=display
+
+scalar mediapc=mean(pc)
+
+# Serie en logaritmos
+
+logs pc
+
+plotlipc <- gnuplot l_pc --with-lines --time-series
+plotlipc.show
+
+corrgm l_pc 20 --plot=display
+
+scalar medial_pc=mean(l_pc)
+
+# Ambas gráficas de los procesos sugieren problemas con la varianza
+# Ambos correlogramas sugieren un AR(2)
+# Ningun correlograma sugiere que haga falta diferenciar la serie
+
+
+## MODELO 1 ##
+
+arima 2 0 0 ; pc # Ambos parámetros significativos y módulos fuera del círculo unitario
+
+AIC1=$aic
+BIC1=$bic
+HQC1=$hqc
+
+genr res1=$uhat
+
+plotres1 <- gnuplot res1 --with-lines --time-series
+plotres1.show
+
+# La gráfica evidencia los problemas de varianza de la serie original. No parece tener problemas de estacionariedad en media
+
+corrgm res1 --plot=display
+
+# ACF y PACF propios de un RB (salvo por el lag 8, pero esto puede deberse a que no se modelaron los outliers)
+
+normtest res1 --jbera
+
+# Rechazo hipótesis de normalidad (de nuevo, esto puede deberse a problemas con los outliers)
+
+
+## MODELO 2 ##
+
+arima 2 0 0 ; l_pc # Ambos parámetros significativos y módulos fuera del círculo unitario
+
+AIC2=$aic
+BIC2=$bic
+HQC2=$hqc
+
+genr res2=$uhat
+
+plotres2 <- gnuplot res2 --with-lines --time-series
+plotres2.show
+
+# La gráfica evidencia los problemas de varianza de la serie original. No parece tener problemas de estacionariedad en media
+
+corrgm res2 --plot=display
+
+# ACF y PACF propios de un RB (salvo por el lag 8, pero esto puede deberse a que no se modelaron los outliers)
+
+normtest res2 --jbera
+
+# Rechazo hipótesis de normalidad (de nuevo, esto puede deberse a problemas con los outliers)
+
+## SELECCIÓN DEL MODELO ##
+
+AIC1
+AIC2
+
+# AIC2 < AIC1 => me quedo con el modelo 2
+
+BIC1
+BIC2
+
+# BIC2 < BIC1 => me quedo con el modelo 2
+
+HQC1
+HQC2
+
+# HQC2 < HQC1 => me quedo con el modelo 2
+
+# Conclusión:
+# El criterio de parsimonia no permite decidir, dado que ambos modelos tienen la misma cantidad de parámetros
+# Todos los criterios de información sugieren quedarse con el modelo 2
+# De todas formas, quedan problemas por modelizar: no estacionariedad en varianza, y los outliers
+
+
+#### SERIE CG ####
+
+plotcg <- gnuplot cg --with-lines --time-series
+plotcg.show
+
+corrgm cg 20 --plot=display 
+
+scalar mediacg=mean(cg)
+
+# Tanto la gráfica de la serie como el correlograma invitan a pensar que se requiere tomar diferencias
+
+## MODELO 1: AR(1) ##
+
+arima 1 0 0 ; cg # Módulo y coeficiente cercanos a 1
+
+
+AIC3=$aic
+BIC3=$bic
+HQC3=$hqc
+
+genr res3=$uhat
+
+plotres3 <- gnuplot res3 --with-lines --time-series
+plotres3.show
+
+corrgm res3 --plot=display
+
+# El correlograma sugiere un ruido blanco, pero la gráfica de los residuos sugiere problemas de varianza y presencia de outliers
+
+normtest res3 --jbera
+
+# No rechazo normalidad de los residuos
+
+## MODELO 2: ARIMA(1,1,0) ##
+
+arima 1 1 0 ; cg # Descarto el modelo dado que el prámetro no es significativo
+
+# Conclusión:
+# Sugiero utilizar modelo AR(1)
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

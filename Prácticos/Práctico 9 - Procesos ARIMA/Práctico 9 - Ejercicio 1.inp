@@ -1,0 +1,101 @@
+##################################
+#### PRÁCTICO 9 - EJERCICIO 1 ####
+##################################
+
+nulldata 300
+setobs 1 1950 --time-series
+genr RBG = randgen(N,0,4)
+
+#### PARTE 1 ####
+
+genr Y=RBG
+genr Y=Y(-1)+0.7*Y(-1)-0.7*Y(-2)+RBG
+
+# a 
+
+plotY <- gnuplot Y --with-lines --time-series
+plotY.show
+
+# b
+
+corrgm Y 24 --plot=display
+
+# c
+
+diff Y
+plotdY <- gnuplot d_Y --with-lines --time-series
+plotdY.show
+
+corrgm d_Y 24 --plot=display
+
+#### PARTE 2 ####
+
+genr X=RBG
+genr X=X(-1)+0.7*RBG(-1)+RBG
+
+# a
+
+plotX <- gnuplot X --with-lines --time-series
+plotX.show
+
+# b
+
+corrgm X 24 --plot=display
+
+# c
+
+diff X
+plotdX <- gnuplot d_X --with-lines --time-series
+plotdX.show
+
+corrgm d_X 24 --plot=display
+
+#### PARTE 3 ####
+
+genr Z=RBG
+genr Z=0.3+0.7*RBG(-1)+RBG+0.7*Z(-1)
+
+# a
+
+plotZ <- gnuplot Z --time-series --with-lines
+plotZ.show
+
+# b
+
+corrgm Z 24 --plot=display
+
+# c
+
+genr Z1=RBG
+genr Z1=0.3+0.7*RBG(-1)+RBG+0.9*Z1(-1)
+corrgm Z1 24 --plot=display
+
+
+genr Z2=RBG
+genr Z2=0.3+0.7*RBG(-1)+RBG+0.1*Z2(-1)
+corrgm Z2 24 --plot=display
+
+
+genr Z3=RBG
+genr Z3=0.3+0.7*RBG(-1)+RBG-0.2*Z3(-1)
+corrgm Z3 24 --plot=display
+
+# d
+
+genr Z4=RBG
+genr Z4=0.3+0.9*RBG(-1)+RBG+0.7*Z4(-1)
+corrgm Z4 24 --plot=display
+
+
+genr Z5=RBG
+genr Z5=0.3+0.2*RBG(-1)+RBG+0.7*Z5(-1)
+corrgm Z5 24 --plot=display
+
+
+genr Z6=RBG
+genr Z6=0.3-0.7*RBG(-1)+RBG+0.7*Z6(-1)
+corrgm Z6 24 --plot=display
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

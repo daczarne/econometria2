@@ -1,0 +1,76 @@
+###################################
+#### PRÁCTICO 12 - EJERCICIO 1 ####
+###################################
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 12 - Regresión espuria y cointegración\intdef.gdt"
+
+#### SE PIDE 1 ####
+
+# Variables en niveles
+
+plot1 <- gnuplot i3 inf --with-lines --time-series
+plot1.show
+
+corrgm i3 24 --plot=display
+corrgm inf 24 --plot=display
+
+# Variables en diferencias
+
+diff i3
+diff inf
+
+plot2 <- gnuplot d_i3 d_inf --with-lines --time-series
+plot2.show
+
+corrgm d_i3 24 --plot=display
+corrgm d_inf 24 --plot=display
+
+#### SE PIDE 2 ####
+
+adf 10 i3 --c --nc --verbose --test-down # Conclusión: existe al menos una RU
+
+adf 10 i3 --nc --difference --verbose --test-down # Conclusión: no existe una segunda RU => i3 es I(1)
+
+
+adf 10 inf --c --nc --verbose --test-down # Conclusión: existe al menos una RU
+
+adf 10 i3 --nc --difference --verbose --test-down # Conclusión: no existe una segunda RU => inf es I(1)
+
+
+#### SE PIDE 3 ####
+
+M1 <- ols i3 const inf
+
+genr beta=$coeff(inf)
+
+genr resi1=$uhat
+
+plotresi1 <- gnuplot resi1 --with-lines --time-series
+plotresi1.show
+
+corrgm resi1 --plot=display
+
+#### SE PIDE 5 ####
+
+adf 10 resi1 --c --nc --verbose --test-down
+
+
+#### SE PIDE 7 ####
+
+genr TCE=i3(-1)-beta*inf(-1)
+
+M2 <- ols d_i3 const TCE d_inf(-1) d_inf(-2) d_i3(-1) d_i3(-2)
+
+genr resi2=$uhat
+
+corrgm resi2 24 --plot=display
+
+#### SE PIDE 8 ####
+
+M3 <- ols i3 const inf inf(-1) i3(-1)
+M4 <- ols d_i3 const d_inf TCE
+
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

@@ -1,0 +1,439 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 3 - Modelos no lineales\Taller_3_2016_MNL.log
+  log type:  text
+ opened on:   2 May 2016, 11:15:09
+
+. 
+. use "$ruta\CAlonMA.dta", clear
+
+. 
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. describe
+
+Contains data from G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 3 - Modelos no lineales\CAlonMA.dta
+  obs:         5,904                          
+ vars:             8                          10 Mar 2011 14:59
+ size:       165,312                          
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ident           int     %8.0g                 FIRM INDEX
+year            int     %8.0g                 YEAR
+n               float   %9.0g                 LN EMPLOYMENT
+w               float   %9.0g                 LN REAL WAGES
+y               float   %9.0g                 LN REAL OUTPUT
+ci              float   %9.0g                 LN REAL INTERMEDIATE INPUTS
+k               float   %9.0g                 LN CAPITAL STOCK (REAL)
+cashfr          float   %9.0g                 REAL CASH FLOW
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+Sorted by:  ident  year
+
+. sum
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+       ident |      5904       369.5    213.0601          1        738
+        year |      5904      1986.5    2.291482       1983       1990
+           n |      5904    4.860978    1.228187   2.302585   9.306014
+           w |      5904    .5552247    .3585647  -1.126656     1.8965
+           y |      5904     6.99474    1.393288   3.454811   11.82199
+-------------+--------------------------------------------------------
+          ci |      5904    6.529781    1.448895   2.302585   11.62086
+           k |      5904    6.434127    1.794334    1.27768   12.20679
+      cashfr |      5904    180.7616    639.4668  -7218.755    12248.3
+
+. pwcorr y n k, star(0.05)
+
+             |        y        n        k
+-------------+---------------------------
+           y |   1.0000 
+           n |   0.8938*  1.0000 
+           k |   0.8642*  0.8254*  1.0000 
+
+. xtile Xn=n, nq(5)                                       // genera una variable que establece en qué quintil de la distribución de la variable n, se enc
+> uentra cada observación.
+
+. xtile Xk=k, nq(5)
+
+. 
+. tabstat y, s(mean sd) by(Xn)
+
+Summary for variables: y
+     by categories of: Xn (5 quantiles of n)
+
+      Xn |      mean        sd
+---------+--------------------
+       1 |  5.429935  .7938811
+       2 |  6.210888  .6390755
+       3 |  6.882336  .6422885
+       4 |  7.608059   .637864
+       5 |  8.868851  .9116782
+---------+--------------------
+   Total |   6.99474  1.393288
+------------------------------
+
+. tabstat y, s(mean sd) by(Xk)            // puede verse la tendencia creciente que tiene el output respecto tanto al trabajo como al capital usado
+
+Summary for variables: y
+     by categories of: Xk (5 quantiles of k)
+
+      Xk |      mean        sd
+---------+--------------------
+       1 |  5.499441  .7794171
+       2 |  6.169266  .7539922
+       3 |  6.893244  .6954367
+       4 |  7.578907  .7199694
+       5 |  8.834401  .9369911
+---------+--------------------
+   Total |   6.99474  1.393288
+------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. /* ##### PARTE 4 ##### */
+. 
+. * FUNCION DE PRODUCCIÓN COBB-DOUGLAS
+. 
+. * Estimación MCO de la función de producción Cobb-Douglas
+. 
+. reg y n k                               // notar que las variables están expresadas en logaritmos
+
+      Source |       SS       df       MS              Number of obs =    5904
+-------------+------------------------------           F(  2,  5901) =16584.24
+       Model |  9728.42672     2  4864.21336           Prob > F      =  0.0000
+    Residual |  1730.78267  5901  .293303283           R-squared     =  0.8490
+-------------+------------------------------           Adj R-squared =  0.8489
+       Total |  11459.2094  5903   1.9412518           Root MSE      =  .54157
+
+------------------------------------------------------------------------------
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           n |   .6423626   .0101672    63.18   0.000     .6224311     .662294
+           k |   .3080899   .0069593    44.27   0.000     .2944472    .3217326
+       _cons |   1.889941   .0290492    65.06   0.000     1.832993    1.946888
+------------------------------------------------------------------------------
+
+. 
+. * Contraste Retornos Constantes a Escala
+. 
+. test n+k=1                              // se rechaza la existencia de retornos constantes a escala
+
+ ( 1)  n + k = 1
+
+       F(  1,  5901) =   70.16
+            Prob > F =    0.0000
+
+. 
+. * Estimación de la función de producción Cobb-Douglas errores robustos
+. 
+. reg y n k, robust
+
+Linear regression                                      Number of obs =    5904
+                                                       F(  2,  5901) =17236.13
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.8490
+                                                       Root MSE      =  .54157
+
+------------------------------------------------------------------------------
+             |               Robust
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           n |   .6423626   .0118453    54.23   0.000     .6191414    .6655837
+           k |   .3080899     .00793    38.85   0.000     .2925441    .3236356
+       _cons |   1.889941   .0298562    63.30   0.000     1.831412     1.94847
+------------------------------------------------------------------------------
+
+. 
+. * Contraste Retornos Constantes a Escala Cobb Douglas, robustos
+. 
+. test n+k=1                              // se rechaza la existencia de retornos constantes a escala
+
+ ( 1)  n + k = 1
+
+       F(  1,  5901) =   62.98
+            Prob > F =    0.0000
+
+. 
+. 
+. * FUNCION DE PRODUCCIÓN CES
+. 
+. g N=exp(n)
+
+. g K=exp(k)
+
+. g Y=exp(y)
+
+. 
+. nl (y = {beta0}+(1/{r})*ln({a}*N^{r}+(1-{a})*K^{r}) ), variables(N K) initial(beta0 2 a 0.5 r 0.05) 
+(obs = 5904)
+
+Iteration 0:  residual SS =  1749.948
+Iteration 1:  residual SS =  1718.194
+Iteration 2:  residual SS =  1718.138
+Iteration 3:  residual SS =  1718.138
+Iteration 4:  residual SS =  1718.138
+Iteration 5:  residual SS =  1718.138
+Iteration 6:  residual SS =  1718.138
+
+      Source |       SS       df       MS
+-------------+------------------------------         Number of obs =      5904
+       Model |  9741.07128     2  4870.53564         R-squared     =    0.8501
+    Residual |   1718.1381  5901  .291160499         Adj R-squared =    0.8500
+-------------+------------------------------         Root MSE      =  .5395929
+       Total |  11459.2094  5903   1.9412518         Res. dev.     =  9466.994
+
+------------------------------------------------------------------------------
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      /beta0 |    1.73419   .0142503   121.69   0.000     1.706254    1.762126
+          /r |   .4982082   .0494479    10.08   0.000     .4012721    .5951442
+          /a |   .8422663   .0126056    66.82   0.000     .8175548    .8669778
+------------------------------------------------------------------------------
+  Parameter beta0 taken as constant term in model & ANOVA table
+
+. 
+. /* El comando nl habilita la introducción de una forma funcional que se desee. 
+> 
+>         Opciones:
+>                 - la opción initial habilita a establecer valores iniciales de los parámetros. Sin una semilla en la opción initial no puede estimar.
+>                 - la opción variables no influye en los resultados pero es necesaria para luego correr el comando mfx que calcula efectos marginales. *
+> /
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. /* ##### PARTE 5 ##### */
+. 
+. * FUNCION DE PRODUCCION COBB-DOUGLAS
+. 
+. * Estimación MCO de la función de producción Cobb-Douglas con errores robustos
+. 
+. reg y n k, robust
+
+Linear regression                                      Number of obs =    5904
+                                                       F(  2,  5901) =17236.13
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.8490
+                                                       Root MSE      =  .54157
+
+------------------------------------------------------------------------------
+             |               Robust
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           n |   .6423626   .0118453    54.23   0.000     .6191414    .6655837
+           k |   .3080899     .00793    38.85   0.000     .2925441    .3236356
+       _cons |   1.889941   .0298562    63.30   0.000     1.831412     1.94847
+------------------------------------------------------------------------------
+
+. 
+. * Muestra la matrix de varianzas y covarianzas de los regresores
+. 
+. matrix list e(V)
+
+symmetric e(V)[3,3]
+                n           k       _cons
+    n   .00014031
+    k  -.00008211   .00006289
+_cons  -.00016471  -1.795e-06   .00089139
+
+. 
+. *FUNCION DE PRODUCCION CES
+. 
+. * Estimación con errores robustos
+. 
+. nl (y = {beta0}+(1/{r})*ln({a}*N^{r}+(1-{a})*K^{r}) ),  variables(N K) initial(beta0 2 a 0.5 r 0.05) r
+(obs = 5904)
+
+Iteration 0:  residual SS =  1749.948
+Iteration 1:  residual SS =  1718.194
+Iteration 2:  residual SS =  1718.138
+Iteration 3:  residual SS =  1718.138
+Iteration 4:  residual SS =  1718.138
+Iteration 5:  residual SS =  1718.138
+Iteration 6:  residual SS =  1718.138
+
+Nonlinear regression                                 Number of obs =      5904
+                                                     R-squared     =    0.8501
+                                                     Adj R-squared =    0.8500
+                                                     Root MSE      =  .5395929
+                                                     Res. dev.     =  9466.994
+
+------------------------------------------------------------------------------
+             |               Robust
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      /beta0 |    1.73419   .0155279   111.68   0.000      1.70375     1.76463
+          /r |   .4982082   .0531174     9.38   0.000     .3940786    .6023377
+          /a |   .8422663   .0137736    61.15   0.000     .8152651    .8692676
+------------------------------------------------------------------------------
+  Parameter beta0 taken as constant term in model
+
+. 
+. * Muestra la matrix de varianzas y covarianzas de los regresores
+. 
+. matrix list e(V)
+
+symmetric e(V)[3,3]
+                 beta0:         r:         a:
+                 _cons      _cons      _cons
+beta0:_cons  .00024112
+    r:_cons  .00049971  .00282146
+    a:_cons  .00017067  .00068491  .00018971
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. /* ##### PARTE 6 ##### */
+. 
+. * Efectos parciales
+. 
+. /* los efectos parciales de la funcion CD pueden interpretarse como como elasticidades debido a que es lineal en los parámetros
+> 
+> En cambio, la CES, al ser no lineal, requiere un tratamiento diferente */
+. 
+. nl (y = {beta0}+(1/{r})*ln({a}*N^{r}+(1-{a})*K^{r}) ),  variables(N K) initial(beta0 2 a 0.5 r 0.05) r
+(obs = 5904)
+
+Iteration 0:  residual SS =  1749.948
+Iteration 1:  residual SS =  1718.194
+Iteration 2:  residual SS =  1718.138
+Iteration 3:  residual SS =  1718.138
+Iteration 4:  residual SS =  1718.138
+Iteration 5:  residual SS =  1718.138
+Iteration 6:  residual SS =  1718.138
+
+Nonlinear regression                                 Number of obs =      5904
+                                                     R-squared     =    0.8501
+                                                     Adj R-squared =    0.8500
+                                                     Root MSE      =  .5395929
+                                                     Res. dev.     =  9466.994
+
+------------------------------------------------------------------------------
+             |               Robust
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      /beta0 |    1.73419   .0155279   111.68   0.000      1.70375     1.76463
+          /r |   .4982082   .0531174     9.38   0.000     .3940786    .6023377
+          /a |   .8422663   .0137736    61.15   0.000     .8152651    .8692676
+------------------------------------------------------------------------------
+  Parameter beta0 taken as constant term in model
+
+. 
+. mfx
+
+Marginal effects after nl
+      y  = Fitted values (predict, yhat)
+         =  8.0940653
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+       N |   .0019904      .00004   55.18   0.000    .00192  .002061   310.403
+       K |   .0001119      .00000   34.13   0.000   .000105  .000118   3415.81
+------------------------------------------------------------------------------
+
+. margins, dydx(N K) atmeans //efecto marginal evaluado en la media
+Warning: cannot perform check for estimable functions.
+
+Conditional marginal effects                      Number of obs   =       5904
+Model VCE    : Robust
+
+Expression   : Fitted values, predict()
+dy/dx w.r.t. : N K
+at           : N               =    310.4031 (mean)
+               K               =    3415.809 (mean)
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           N |   .0019904   .0000361    55.18   0.000     .0019197    .0020611
+           K |   .0001119   3.28e-06    34.13   0.000     .0001055    .0001183
+------------------------------------------------------------------------------
+
+. margins, dydx(N K) //efecto marginal promedio
+Warning: cannot perform check for estimable functions.
+
+Average marginal effects                          Number of obs   =       5904
+Model VCE    : Robust
+
+Expression   : Fitted values, predict()
+dy/dx w.r.t. : N K
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           N |   .0103017   .0001052    97.91   0.000     .0100955    .0105079
+           K |   .0011941   .0000732    16.31   0.000     .0010506    .0013377
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. /* ##### PARTE 8 ##### */
+. 
+. /* Si r = 0, entonces la función CES tiene, en el límite, a una función Cobb-Douglas */
+. 
+. nl (y = {beta0}+(1/{r})*ln({a}*N^{r}+(1-{a})*K^{r}) ),  variables(N K) initial(beta0 2 a 0.5 r 0.05) r
+(obs = 5904)
+
+Iteration 0:  residual SS =  1749.948
+Iteration 1:  residual SS =  1718.194
+Iteration 2:  residual SS =  1718.138
+Iteration 3:  residual SS =  1718.138
+Iteration 4:  residual SS =  1718.138
+Iteration 5:  residual SS =  1718.138
+Iteration 6:  residual SS =  1718.138
+
+Nonlinear regression                                 Number of obs =      5904
+                                                     R-squared     =    0.8501
+                                                     Adj R-squared =    0.8500
+                                                     Root MSE      =  .5395929
+                                                     Res. dev.     =  9466.994
+
+------------------------------------------------------------------------------
+             |               Robust
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      /beta0 |    1.73419   .0155279   111.68   0.000      1.70375     1.76463
+          /r |   .4982082   .0531174     9.38   0.000     .3940786    .6023377
+          /a |   .8422663   .0137736    61.15   0.000     .8152651    .8692676
+------------------------------------------------------------------------------
+  Parameter beta0 taken as constant term in model
+
+. 
+. test [r]_cons=0 
+
+ ( 1)  [r]_cons = 0
+
+       F(  1,  5901) =   87.97
+            Prob > F =    0.0000
+
+. 
+. /* se rechaza la Ho r=0, por lo que la función CES parece más adecuada que la Cobb-Douglas para estos datos. */
+. 
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. log close
+      name:  <unnamed>
+       log:  G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 3 - Modelos no lineales\Taller_3_2016_MNL.log
+  log type:  text
+ closed on:   2 May 2016, 11:15:49
+---------------------------------------------------------------------------------------------------------------------------------------------------------

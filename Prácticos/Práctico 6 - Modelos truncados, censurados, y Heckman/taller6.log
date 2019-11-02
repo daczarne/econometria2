@@ -1,0 +1,185 @@
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. use "$ruta/per_2009_muj.dta", clear
+
+. keep if edad>=25 & edad<=60
+(14261 observations deleted)
+
+. 
+end of do-file
+
+. browse
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. tabstat horas, s(mean p75)
+
+    variable |      mean       p75
+-------------+--------------------
+       horas |  26.99067        45
+----------------------------------
+
+. count if horas==0 //cantidad de mujeres que trabajn 0 horas: 7953
+ 7953
+
+. 
+end of do-file
+
+. browse
+
+. count if xyhs == .
+xyhs not found
+r(111);
+
+. count if yxhs == .
+ 7953
+
+. count if yxhs ==.  | yxhs == 0
+ 8557
+
+. count if horas == 0
+ 7953
+
+. count if horas == .
+    0
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. count if yxhs==0
+  604
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. g exp_pot=edad-aniosed-6
+
+. g exp_cuad=exp_pot^2
+
+. g lylabd_hom=ln(1+ylabd_hom)
+(6659 missing values generated)
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. global lista1 "aniosed exp_pot exp_cua" 
+
+. global lista2 "cant_hijos"      
+
+. global lista3 "lylabd_hom"
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. g control = horas + aniosed + edad + cant_hijos + lylabd_hom
+(6659 missing values generated)
+
+. keep if control !=. //quedan 19919 observaciones
+(6659 observations deleted)
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. reg horas $lista1  $lista2 if horas>0
+
+      Source |       SS       df       MS              Number of obs =   13167
+-------------+------------------------------           F(  4, 13162) =   83.91
+       Model |  96936.3269     4  24234.0817           Prob > F      =  0.0000
+    Residual |  3801246.08 13162  288.804595           R-squared     =  0.0249
+-------------+------------------------------           Adj R-squared =  0.0246
+       Total |  3898182.41 13166  296.079478           Root MSE      =  16.994
+
+------------------------------------------------------------------------------
+       horas |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    aniosedu |   .6101407   .0416848    14.64   0.000     .5284325     .691849
+     exp_pot |   .2071339   .0656402     3.16   0.002     .0784697    .3357981
+    exp_cuad |  -.0035754   .0012511    -2.86   0.004    -.0060278    -.001123
+  cant_hijos |  -.8542656   .1334352    -6.40   0.000    -1.115818   -.5927133
+       _cons |   29.95701   .9776397    30.64   0.000     28.04069    31.87332
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. g seleccion = (horas>0)
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. heckman horas  $lista1 $lista2, sel( seleccion = $lista1 $lista2 $lista3) two mills(lambda1i)
+
+Heckman selection model -- two-step estimates   Number of obs      =     19919
+(regression model with sample selection)        Censored obs       =      6752
+                                                Uncensored obs     =     13167
+
+                                                Wald chi2(4)       =     48.97
+                                                Prob > chi2        =    0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+horas        |
+    aniosedu |   1.491103   .2421109     6.16   0.000     1.016575    1.965632
+     exp_pot |   .5035004   .1121165     4.49   0.000     .2837561    .7232446
+    exp_cuad |  -.0105782   .0023913    -4.42   0.000    -.0152651   -.0058913
+  cant_hijos |  -1.950652   .3338624    -5.84   0.000    -2.605011   -1.296294
+       _cons |   9.545691   5.595613     1.71   0.088    -1.421509    20.51289
+-------------+----------------------------------------------------------------
+seleccion    |
+    aniosedu |   .0925871   .0029355    31.54   0.000     .0868336    .0983405
+     exp_pot |   .0204042   .0044421     4.59   0.000     .0116978    .0291106
+    exp_cuad |  -.0004922   .0000807    -6.10   0.000    -.0006504    -.000334
+  cant_hijos |  -.0955737   .0078787   -12.13   0.000    -.1110156   -.0801317
+  lylabd_hom |  -.0007083   .0037679    -0.19   0.851    -.0080931    .0066766
+       _cons |  -.4373499   .0732671    -5.97   0.000    -.5809509    -.293749
+-------------+----------------------------------------------------------------
+mills        |
+      lambda |   20.40891   5.429278     3.76   0.000     9.767716    31.05009
+-------------+----------------------------------------------------------------
+         rho |    0.91885
+       sigma |  22.211331
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\dacza\AppData\Local\Temp\STD00000000.tmp"
+
+. margins, dydx($lista1 $lista2)
+
+Average marginal effects                          Number of obs   =      19919
+Model VCE    : Conventional
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : aniosedu exp_pot exp_cuad cant_hijos
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    aniosedu |   1.491103   .2421109     6.16   0.000     1.016575    1.965632
+     exp_pot |   .5035004   .1121165     4.49   0.000     .2837561    .7232446
+    exp_cuad |  -.0105782   .0023913    -4.42   0.000    -.0152651   -.0058913
+  cant_hijos |  -1.950652   .3338624    -5.84   0.000    -2.605011   -1.296294
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. exit, clear

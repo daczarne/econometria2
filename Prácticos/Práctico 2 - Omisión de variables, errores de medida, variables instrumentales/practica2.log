@@ -1,0 +1,6 @@
+. run "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+file C:\Users\dacza_000\Desktop\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 2 - Omisión de variables, errores de medida, variables
+    instrumentales\taller2_VI.dta not found
+r(601);
+
+. exit, clear

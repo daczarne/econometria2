@@ -1,0 +1,104 @@
+####Ejercicio 2####Exportación de derivados de petróleo
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 11 - Raíz unitaria\export_derivados_petroleo.xls"
+
+setobs 1 1965 --time-series
+gnuplot Derivados --with-lines --time-series
+logs Derivados
+gnuplot l_Derivados --with-lines --time-series
+
+#Emprezamos testeando el modelo C (con constante y tendencia)
+
+adf 5 l_Derivados --ct --verbose --test-down
+
+# -3.5< -2.582 --> No rechazo H0 (gamma = 0) 
+# 2.519 < 2.81 --> No rechazo H0 (beta = 0 | gamma = 0) 
+
+#---> Estimamos el modelo B (con constante y sin tendencia)
+
+adf 5 l_Derivados --c --verbose --test-down
+# -2.93 < -0.3247 --> No rechazo H0 (gamma = 0)
+# 0.5545 < 2.56 --> No rechazo Ho (alpha = 0 | gamma = 0)
+
+#---> Estimamos el modelo C (sin constante y sin tendencia)
+adf 5 l_Derivados --nc --verbose --test-down
+#1,679 > -1.95 --> No rechazo H0 (gamma = 0)
+
+
+####Ejercicio 1####
+
+#Creamos un juego de datos en blanco
+nulldata 300
+#Le damos estructura de serie temporal
+setobs 1 1950 --time-series
+
+#Genere una serie de 300 observaciones con nombre BLANCO cuya
+#distribución es normal con media cero y varianza 1 (semilla 12345).
+
+set seed 12345
+genr BLANCO = randgen(N,0,1)
+
+#A partir de la serie BLANCO obtenga una serie x 
+#de tamaño 299 cuyo proceso es un paseo aleatorio sin deriva
+#cuyo valor inicial es cero.
+
+#creamos una variable X como un vector de 0
+
+genr X=0*const
+
+#la sobreescribimos usando la expresión para un random walk sin deriva
+genr X=X(-1)+BLANCO
+
+#Grafíquela y obtenga su correlograma.
+corrgm X 24
+gnuplot X --with-lines --time-series
+
+#Diferencie la serie y analice su
+#comportamiento
+
+diff X
+corrgm d_X 24
+gnuplot d_X --with-lines --time-series
+
+#cuyo proceso es un paseo aleatorio con deriva 
+# igual a 0,3, cuyo valor inicial es cero
+
+genr Y=0*const
+genr Y=0.3+Y(-1)+BLANCO
+
+#Grafíquela y obtenga su
+#correlograma. 
+gnuplot Y --with-lines --time-series
+diff Y
+corrgm d_Y 24
+gnuplot d_Y --with-lines --time-series
+#Genere la siguiente serie: z=2*z(-1)-z(-2)+BLANCO
+genr Z=0*const
+genr Z=2*Z(-1)-Z(-2)+BLANCO
+#Observe la gráfica y el correlograma. 
+gnuplot Z --with-lines --time-series
+corrgm Z 24
+
+# analice la existencia de raíces unitarias en z 
+# mediante un contraste de Dickey-Fuller Aumentado
+
+
+adf 10 Z --nc --c --ct --verbose --test-down
+
+#Repita los contrastes de Dickey-Fuller
+#Aumentado para las primeras diferencias de la serie.
+diff Z
+adf 10 d_Z --nc --c --ct --verbose --test-down
+
+#realice las pruebas necesarias 
+#para definir empíricamente el orden de integración.
+
+#Realizamos el ADF sobre la segunda diferencia de Z
+#No es necesario diferenciarla, podemos usar la opción difference
+#para hacer el test sobre la diferencia de la variable (en este caso d_Z)
+
+adf 10 d_Z --nc --c --ct --difference --verbose --test-down
+
+##Rechazamos que la diferencia de d_Z tenga raíz unitaria. Como d_d_Z es I(0),
+#d_Z es I(1) y Z es I(2)
+

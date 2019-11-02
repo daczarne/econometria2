@@ -1,0 +1,38 @@
+###################################
+#### PRÁCTICO 11 - EJERCICIO 2 ####
+###################################
+
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 11 - Raíz unitaria\export_derivados_petroleo.xls"
+
+setobs 1 1965 --time-series
+
+# Inspección visual de la serie en niveles
+
+plotder <- gnuplot Derivados --with-lines --time-series
+plotder.show
+
+corrgm Derivados 24 --plot=display
+
+# Inspección visual de la serie en logaritmos
+
+logs Derivados
+
+plotlder <- gnuplot l_Derivados --with-lines --time-series
+plotlder.show
+
+corrgm l_Derivados 24 --plot=display
+
+# Test ADF a la serie en logs
+
+adf 5 l_Derivados --ct --c --nc --verbose --test-down # Conclusión: existe al menos una RU
+
+# Test ADF a la diferencia de la serie en logaritmos
+
+adf 5 l_Derivados --nc --difference --verbose --test-down # Conclusión: no existe una segunda RU
+
+# Por lo tanto, la serie del logaritmo de los derivados es una serie I(1)
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

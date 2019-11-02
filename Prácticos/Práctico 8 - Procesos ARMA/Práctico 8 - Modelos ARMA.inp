@@ -1,0 +1,125 @@
+##################################
+#### PRÁCTICO 8 - EJERCICIO 1 ####
+##################################
+
+#### PARTE a ####
+
+nulldata 300
+setobs 1 1711 --time-series
+
+#### PARTE b ####
+
+set seed 20
+genr BLANCO = randgen(N,0,1)
+
+#### PARTE c ####
+
+Blanco_plot <- gnuplot BLANCO --with-lines --time-series
+Blanco_plot.show
+
+#### PARTE d ####
+
+Blanco_Corr <- corrgm BLANCO 24 --plot=display
+Blanco_Corr.show
+
+
+##################################
+#### PRÁCTICO 8 - EJERCICIO 2 ####
+##################################
+
+#### PARTE a ####
+
+genr X1=2+BLANCO+0.7*BLANCO(-1)
+
+X1_Corr <- corrgm X1 24 --bartlett --plot=display
+X1_Corr.show
+
+#### PARTE b ####
+
+genr X2=2+BLANCO-0.7*BLANCO(-1)
+
+X2_Corr <- corrgm X2 24 --bartlett --plot=display
+X2_Corr.show
+
+#### PARTE c ####
+
+X1_plot <- gnuplot X1 --with-lines --time-series
+X1_plot.show
+
+X2_plot <- gnuplot X2 --with-lines --time-series
+X2_plot.show
+
+#### PARTE d ####
+
+arima 0 0 1; X1
+arima 0 0 1; X2
+
+
+##################################
+#### PRÁCTICO 8 - EJERCICIO 3 ####
+##################################
+
+#### PARTE a ####
+
+genr Y1=BLANCO # Esta variable se crea para tener un valor inicial, pero luego se remplaza
+genr Y1=0.9*Y1(-1)+BLANCO
+
+Y1_Corr <- corrgm Y1 24 --bartlett --plot=display
+Y1_Corr.show
+
+#### PARTE b ####
+
+genr Y2=BLANCO # Esta variable se crea para tener un valor inicial, pero luego se remplaza
+genr Y2=-0.9*Y2(-1)+BLANCO
+
+Y2_Corr <- corrgm Y2 24 --bartlett --plot=display
+Y2_Corr.show
+
+#### PARTE c ####
+
+genr Y3=BLANCO # Esta variable se crea para tener un valor inicial, pero luego se remplaza
+genr Y3=0.5*Y3(-1)+BLANCO
+
+Y3_Corr <- corrgm Y3 24 --bartlett --plot=display
+Y3_Corr.show
+
+#### PARTE d ####
+
+Y1_plot <- gnuplot Y1 --with-lines --time-series
+Y1_plot.show
+
+Y2_plot <- gnuplot Y2 --with-lines --time-series
+Y2_plot.show
+
+Y3_plot <- gnuplot Y3 --with-lines --time-series
+Y3_plot.show
+
+#### PARTE e ####
+
+arima 1 0 0; Y3
+
+#### PARTE f ####
+
+genr Y4=BLANCO # Esta variable se crea para tener un valor inicial, pero luego se remplaza
+genr Y4=1+0.5*Y4(-1)+BLANCO
+
+Y4_Corr <- corrgm Y4 24 --bartlett --plot=display
+Y4_Corr.show
+
+##################################
+#### PRÁCTICO 8 - EJERCICIO 6 ####
+##################################
+
+genr W=BLANCO-0.7*BLANCO(-1)+0.3*BLANCO(-2)
+
+W_plot <- gnuplot W --with-lines --time-series
+W_plot.show
+
+W_Corr <- corrgm W 24 --bartlett --plot=display
+W_Corr.show
+
+arima 0 0 2, W
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

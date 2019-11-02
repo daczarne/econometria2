@@ -1,0 +1,1259 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 5 - Modelos binarios\taller5_2015.log
+  log type:  text
+ opened on:   4 May 2016, 10:02:12
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se abre la base MROZ y se ordenan las variables alfabéticamente
+. use "$ruta/mroz.dta", clear     
+
+. aorder  
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+         age |       753    42.53785    8.072574         30         60
+        city |       753    .6427623    .4795042          0          1
+        educ |       753    12.28685    2.280246          5         17
+       exper |       753    10.63081     8.06913          0         45
+     expersq |       753    178.0385    249.6308          0       2025
+-------------+--------------------------------------------------------
+      faminc |       753    23080.59     12190.2       1500      96000
+    fatheduc |       753    8.808765     3.57229          0         17
+       hours |       753    740.5764    871.3142          0       4950
+      husage |       753    45.12085    8.058793         30         60
+     huseduc |       753    12.49137    3.020804          3         17
+-------------+--------------------------------------------------------
+      hushrs |       753    2267.271    595.5666        175       5010
+     huswage |       753    7.482179    4.230559      .4121     40.509
+        inlf |       753    .5683931    .4956295          0          1
+     kidsge6 |       753    1.353254    1.319874          0          8
+     kidslt6 |       753    .2377158     .523959          0          3
+-------------+--------------------------------------------------------
+       lwage |       428    1.190173    .7231978  -2.054164   3.218876
+    motheduc |       753    9.250996    3.367468          0         17
+         mtr |       753    .6788632    .0834955      .4415      .9415
+    nwifeinc |       753    20.12896     11.6348  -.0290575         96
+     repwage |       753    1.849734    2.419887          0       9.98
+-------------+--------------------------------------------------------
+        unem |       753    8.623506    3.114934          3         14
+        wage |       753    2.374565    3.241829          0         25
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. tab inlf
+
+   =1 if in |
+  lab frce, |
+       1975 |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |        325       43.16       43.16
+          1 |        428       56.84      100.00
+------------+-----------------------------------
+      Total |        753      100.00
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. help egen
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. egen propunos = mean(inlf) //mirar ayuda del comando egen
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum propunos
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |       753    .5683931           0   .5683931   .5683931
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse 
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. browse 
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum propunos
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |       753    .5683931           0   .5683931   .5683931
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. pwcorr inlf nwifeinc educ exper expersq age kidslt6 kidsge6,star(0.05)
+
+             |     inlf nwifeinc     educ    exper  expersq      age  kidslt6
+-------------+---------------------------------------------------------------
+        inlf |   1.0000 
+    nwifeinc |  -0.1176*  1.0000 
+        educ |   0.1874*  0.2776*  1.0000 
+       exper |   0.3425* -0.1722*  0.0663   1.0000 
+     expersq |   0.2607* -0.1652*  0.0241   0.9376*  1.0000 
+         age |  -0.0805*  0.0586  -0.1202*  0.3340*  0.3803*  1.0000 
+     kidslt6 |  -0.2137*  0.0382   0.1087* -0.1940* -0.1838* -0.4339*  1.0000 
+     kidsge6 |  -0.0024   0.0248  -0.0589  -0.2995* -0.2999* -0.3854*  0.0842*
+
+             |  kidsge6
+-------------+---------
+     kidsge6 |   1.0000 
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. tabstat nwifeinc educ exper expersq age kidslt6 kidsge6, by(inlf) s(mean)
+
+Summary statistics: mean
+  by categories of: inlf (=1 if in lab frce, 1975)
+
+    inlf |  nwifeinc      educ     exper   expersq       age   kidslt6   kidsge6
+---------+----------------------------------------------------------------------
+       0 |  21.69805  11.79692  7.461538  103.3938  43.28308  .3661538  1.356923
+       1 |  18.93748  12.65888  13.03738  234.7196  41.97196  .1401869  1.350467
+---------+----------------------------------------------------------------------
+   Total |  20.12896  12.28685  10.63081  178.0385  42.53785  .2377158  1.353254
+--------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. graph box exper, by(inlf)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. help graph
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. global lista "nwifeinc educ exper expersq age kidslt6 kidsge6"  
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. reg  inlf  $lista, robust
+
+Linear regression                                      Number of obs =     753
+                                                       F(  7,   745) =   62.48
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.2642
+                                                       Root MSE      =  .42713
+
+------------------------------------------------------------------------------
+             |               Robust
+        inlf |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |  -.0034052   .0015249    -2.23   0.026    -.0063988   -.0004115
+        educ |   .0379953    .007266     5.23   0.000      .023731    .0522596
+       exper |   .0394924     .00581     6.80   0.000     .0280864    .0508983
+     expersq |  -.0005963     .00019    -3.14   0.002    -.0009693   -.0002233
+         age |  -.0160908    .002399    -6.71   0.000    -.0208004   -.0113812
+     kidslt6 |  -.2618105   .0317832    -8.24   0.000    -.3242058   -.1994152
+     kidsge6 |   .0130122   .0135329     0.96   0.337     -.013555    .0395795
+       _cons |   .5855192   .1522599     3.85   0.000     .2866098    .8844287
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. mean(educ)
+
+Mean estimation                     Number of obs    =     753
+
+--------------------------------------------------------------
+             |       Mean   Std. Err.     [95% Conf. Interval]
+-------------+------------------------------------------------
+        educ |   12.28685   .0830968      12.12372    12.44998
+--------------------------------------------------------------
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. reg  inlf  $lista, robust
+
+Linear regression                                      Number of obs =     753
+                                                       F(  7,   745) =   62.48
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.2642
+                                                       Root MSE      =  .42713
+
+------------------------------------------------------------------------------
+             |               Robust
+        inlf |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |  -.0034052   .0015249    -2.23   0.026    -.0063988   -.0004115
+        educ |   .0379953    .007266     5.23   0.000      .023731    .0522596
+       exper |   .0394924     .00581     6.80   0.000     .0280864    .0508983
+     expersq |  -.0005963     .00019    -3.14   0.002    -.0009693   -.0002233
+         age |  -.0160908    .002399    -6.71   0.000    -.0208004   -.0113812
+     kidslt6 |  -.2618105   .0317832    -8.24   0.000    -.3242058   -.1994152
+     kidsge6 |   .0130122   .0135329     0.96   0.337     -.013555    .0395795
+       _cons |   .5855192   .1522599     3.85   0.000     .2866098    .8844287
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se guardan los valores ajustados en una variable prMPL (predicción de la probabilidad de cada individuo)
+. predict prMPL
+(option xb assumed; fitted values)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Notar que existen estimaciones de probabilidad fuera del intervalo [0,1]
+. count if[prMPL<0]
+   16
+
+. count if[prMPL>1]
+   17
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Efecto parcial del ingreso de los demás miembros del hogar
+. g EFNWmpl=_b[nwifeinc]
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Predicciones de INLF utilizando como valor de corte la proporción muestral de unos
+. g UNOMPL=(prMPL>propunos)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab inlf UNOMPL, col    
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+  =1 if in |
+ lab frce, |        UNOMPL
+      1975 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       238         87 |       325 
+           |     66.11      22.14 |     43.16 
+-----------+----------------------+----------
+         1 |       122        306 |       428 
+           |     33.89      77.86 |     56.84 
+-----------+----------------------+----------
+     Total |       360        393 |       753 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Predicciones de INLF utilizando como valor de corte 0,5
+. g UNOMPL2=(prMPL>0.5)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab inlf UNOMPL2, col   
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+  =1 if in |
+ lab frce, |        UNOMPL2
+      1975 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       203        122 |       325 
+           |     72.24      25.85 |     43.16 
+-----------+----------------------+----------
+         1 |        78        350 |       428 
+           |     27.76      74.15 |     56.84 
+-----------+----------------------+----------
+     Total |       281        472 |       753 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen EPsp6mpl=_b[kidslt6]*3 - _b[kidslt6]*1
+
+. sum EPsp6mpl
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    EPsp6mpl |       753    -.523621           0   -.523621   -.523621
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen EPsp6mpl=_b[kidslt6]*3 - _b[kidslt6]*1
+EPsp6mpl already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum EPsp6mpl
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    EPsp6mpl |       753    -.523621           0   -.523621   -.523621
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. Epsp6mpl
+unrecognized command:  Epsp6mpl
+r(199);
+
+end of do-file
+
+r(199);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. display Epsp6mpl
+Epsp6mpl not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar list
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. list scalar
+variable scalar not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * CONTRASTES DE SIGNIFICACION CONJUNTA (CONTRASTES DE EXCLUSION)
+. test kidslt6 kidsge6
+
+ ( 1)  kidslt6 = 0
+ ( 2)  kidsge6 = 0
+
+       F(  2,   745) =   35.55
+            Prob > F =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. // se puede crear una variable cantidad de hijos menores de 18 g hijos= kidslt6+kidsge6
+. 
+. test nwifeinc educ exper expersq age
+
+ ( 1)  nwifeinc = 0
+ ( 2)  educ = 0
+ ( 3)  exper = 0
+ ( 4)  expersq = 0
+ ( 5)  age = 0
+
+       F(  5,   745) =   63.87
+            Prob > F =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. /* ##### PARTE 6 ##### */
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. probit inlf $lista,
+
+Iteration 0:   log likelihood =  -514.8732  
+Iteration 1:   log likelihood = -402.06651  
+Iteration 2:   log likelihood = -401.30273  
+Iteration 3:   log likelihood = -401.30219  
+Iteration 4:   log likelihood = -401.30219  
+
+Probit regression                                 Number of obs   =        753
+                                                  LR chi2(7)      =     227.14
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -401.30219                       Pseudo R2       =     0.2206
+
+------------------------------------------------------------------------------
+        inlf |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |  -.0120237   .0048398    -2.48   0.013    -.0215096   -.0025378
+        educ |   .1309047   .0252542     5.18   0.000     .0814074     .180402
+       exper |   .1233476   .0187164     6.59   0.000     .0866641    .1600311
+     expersq |  -.0018871      .0006    -3.15   0.002     -.003063   -.0007111
+         age |  -.0528527   .0084772    -6.23   0.000    -.0694678   -.0362376
+     kidslt6 |  -.8683285   .1185223    -7.33   0.000    -1.100628    -.636029
+     kidsge6 |    .036005   .0434768     0.83   0.408     -.049208    .1212179
+       _cons |   .2700768    .508593     0.53   0.595    -.7267473    1.266901
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se guardan los valores ajustados en una variable prMPL (predicción de la probabilidad de cada individuo)
+. predict prPROBIT
+(option pr assumed; Pr(inlf))
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * predicciones de INLF utilizando como valor de corte la proporción muestral de unos                                                    
+. g UNOP=(prPROBIT>propunos)
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab inlf UNOP, col
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+  =1 if in |
+ lab frce, |         UNOP
+      1975 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       234         91 |       325 
+           |     69.03      21.98 |     43.16 
+-----------+----------------------+----------
+         1 |       105        323 |       428 
+           |     30.97      78.02 |     56.84 
+-----------+----------------------+----------
+     Total |       339        414 |       753 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. *predicciones de INLF utilizando como valor de corte 0,5
+. g UNOP2=(prPROBIT>0.5)
+
+. *BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab  inlf UNOP2, col
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+  =1 if in |
+ lab frce, |         UNOP2
+      1975 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       205        120 |       325 
+           |     71.93      25.64 |     43.16 
+-----------+----------------------+----------
+         1 |        80        348 |       428 
+           |     28.07      74.36 |     56.84 
+-----------+----------------------+----------
+     Total |       285        468 |       753 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Comando de Stata que calcula proporción de predicciones correctas
+. * 1. Valor por defecto de STATA: 0.5
+. estat class
+
+Probit model for inlf
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       348           120  |        468
+     -     |        80           205  |        285
+-----------+--------------------------+-----------
+   Total   |       428           325  |        753
+
+Classified + if predicted Pr(D) >= .5
+True D defined as inlf != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   81.31%
+Specificity                     Pr( -|~D)   63.08%
+Positive predictive value       Pr( D| +)   74.36%
+Negative predictive value       Pr(~D| -)   71.93%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   36.92%
+False - rate for true D         Pr( -| D)   18.69%
+False + rate for classified +   Pr(~D| +)   25.64%
+False - rate for classified -   Pr( D| -)   28.07%
+--------------------------------------------------
+Correctly classified                        73.44%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * 2. Usando proporción de unos en la muestra
+. sum propunos
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |       753    .5683931           0   .5683931   .5683931
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos')
+
+Probit model for inlf
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       323            91  |        414
+     -     |       105           234  |        339
+-----------+--------------------------+-----------
+   Total   |       428           325  |        753
+
+Classified + if predicted Pr(D) >= .5683931
+True D defined as inlf != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   75.47%
+Specificity                     Pr( -|~D)   72.00%
+Positive predictive value       Pr( D| +)   78.02%
+Negative predictive value       Pr(~D| -)   69.03%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   28.00%
+False - rate for true D         Pr( -| D)   24.53%
+False + rate for classified +   Pr(~D| +)   21.98%
+False - rate for classified -   Pr( D| -)   30.97%
+--------------------------------------------------
+Correctly classified                        73.97%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * EFECTOS PARCIALES
+. mfx compute //por defecto son en la media de todas las variables, eso genera problemas con las dummy
+
+Marginal effects after probit
+      y  = Pr(inlf) (predict)
+         =  .58154201
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+nwifeinc |  -.0046962      .00189   -2.48   0.013  -.008401 -.000991    20.129
+    educ |   .0511287      .00986    5.19   0.000   .031805  .070452   12.2869
+   exper |   .0481771      .00733    6.57   0.000   .033815  .062539   10.6308
+ expersq |  -.0007371      .00023   -3.14   0.002  -.001197 -.000277   178.039
+     age |  -.0206432      .00331   -6.24   0.000  -.027127  -.01416   42.5378
+ kidslt6 |  -.3391514      .04636   -7.32   0.000  -.430012 -.248291   .237716
+ kidsge6 |   .0140628      .01699    0.83   0.408  -.019228  .047353   1.35325
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. // Otras pruebas
+. mfx compute, at(educ=12)
+
+warning: no value assigned in at() for variables nwifeinc exper expersq age kidslt6 kidsge6;
+   means used for nwifeinc exper expersq age kidslt6 kidsge6
+
+Marginal effects after probit
+      y  = Pr(inlf) (predict)
+         =  .56682224
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+nwifeinc |  -.0047293      .00191   -2.48   0.013  -.008464 -.000995    20.129
+    educ |   .0514891      .00999    5.15   0.000   .031909  .071069        12
+   exper |   .0485167      .00737    6.58   0.000    .03407  .062964   10.6308
+ expersq |  -.0007423      .00024   -3.14   0.002  -.001205 -.000279   178.039
+     age |  -.0207887      .00333   -6.25   0.000  -.027312 -.014265   42.5378
+ kidslt6 |  -.3415421      .04671   -7.31   0.000  -.433092 -.249992   .237716
+ kidsge6 |   .0141619      .01711    0.83   0.408  -.019365  .047689   1.35325
+------------------------------------------------------------------------------
+
+. mfx compute, at(educ=12 age=35 kidslt6=1 kidsge6=0)
+
+warning: no value assigned in at() for variables nwifeinc exper expersq;
+   means used for nwifeinc exper expersq
+
+Marginal effects after probit
+      y  = Pr(inlf) (predict)
+         =   .4427692
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+nwifeinc |  -.0047473       .0019   -2.50   0.012  -.008472 -.001023    20.129
+    educ |   .0516851      .00979    5.28   0.000   .032504  .070867        12
+   exper |   .0487013      .00742    6.56   0.000   .034157  .063245   10.6308
+ expersq |  -.0007451      .00024   -3.15   0.002  -.001209 -.000282   178.039
+     age |  -.0208678       .0035   -5.96   0.000  -.027735    -.014        35
+ kidslt6 |  -.3428423      .04445   -7.71   0.000  -.429962 -.255722         1
+ kidsge6 |   .0142158      .01702    0.84   0.404  -.019143  .047575         0
+------------------------------------------------------------------------------
+
+. mfx compute, at(educ=6 age=30 kidslt6=1 kidsge6=0)
+
+warning: no value assigned in at() for variables nwifeinc exper expersq;
+   means used for nwifeinc exper expersq
+
+Marginal effects after probit
+      y  = Pr(inlf) (predict)
+         =  .25298783
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+nwifeinc |  -.0038449      .00146   -2.63   0.009  -.006713 -.000977    20.129
+    educ |   .0418604      .00487    8.60   0.000   .032323  .051398         6
+   exper |   .0394438      .00864    4.56   0.000   .022503  .056385   10.6308
+ expersq |  -.0006034      .00021   -2.86   0.004  -.001016 -.000191   178.039
+     age |  -.0169011      .00453   -3.73   0.000  -.025772  -.00803        30
+ kidslt6 |  -.2776722      .04999   -5.55   0.000  -.375649 -.179696         1
+ kidsge6 |   .0115136      .01321    0.87   0.384  -.014382  .037409         0
+------------------------------------------------------------------------------
+
+. mfx compute, at(nwifeinc=0 educ=6 age=30 kidslt6=1 kidsge6=0)
+
+warning: no value assigned in at() for variables exper expersq;
+   means used for exper expersq
+
+Marginal effects after probit
+      y  = Pr(inlf) (predict)
+         =  .33611421
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+nwifeinc |  -.0043861      .00177   -2.48   0.013  -.007846 -.000926         0
+    educ |   .0477523      .00921    5.18   0.000   .029696  .065808         6
+   exper |   .0449956      .00683    6.59   0.000   .031614  .058377   10.6308
+ expersq |  -.0006884      .00022   -3.15   0.002  -.001117 -.000259   178.039
+     age |    -.01928      .00309   -6.23   0.000  -.025341 -.013219        30
+ kidslt6 |  -.3167549      .04324   -7.33   0.000  -.401495 -.232015         1
+ kidsge6 |   .0131341      .01586    0.83   0.408   -.01795  .044219         0
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. predict indice, index   
+
+. g gprobit=normalden(indice)     
+
+. g EFNWp=gprobit*_b[nwifeinc]
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. tabstat EFNWp, s(mean p10 p25 p50 p75 p90)       //observamos la variación
+
+    variable |      mean       p10       p25       p50       p75       p90
+-------------+------------------------------------------------------------
+       EFNWp | -.0036162  -.004755 -.0045894 -.0039429 -.0029055 -.0018186
+--------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. xtile quint_ingre = nwifeinc, nq(5)
+
+. tabstat EFNWp, by(quint_ingre) s(mean)  //analizamos el efecto mg del ingreso por quintiles de ingreso
+
+Summary for variables: EFNWp
+     by categories of: quint_ingre (5 quantiles of nwifeinc)
+
+quint_ingre |      mean
+------------+----------
+          1 | -.0034547
+          2 | -.0035398
+          3 | -.0035136
+          4 | -.0038454
+          5 | -.0037274
+------------+----------
+      Total | -.0036162
+-----------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Para reproducir a mano el efecto marginal de NWIFEINC en el vector de medias:
+. egen m1= mean(nwifeinc) 
+
+. egen m2= mean(educ) 
+
+. egen m3= mean(exper) 
+
+. egen m4= mean(expersq)
+
+. egen m5= mean(age) 
+
+. egen m6= mean(kidslt6) 
+
+. egen m7= mean(kidsge6)
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen gprobit1= normalden(_b[nwifeinc]*m1 + _b[educ]*m2 + _b[exper]*m3 + _b[expersq]*m4 + _b[age]*m5 + _b[kidslt6]*m6 + _b[kidsge6]*m7 + _b[_cons])
+
+. gen parcial_p_nwifeinc= gprobit1*_b[nwifeinc]
+
+. sum parcial_p_nwifeinc //como es esperable la media coincide exactamente con la obtenida con por "mfx compute"
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+parcial_p_~c |       753   -.0046962           0  -.0046962  -.0046962
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Para ver el efecto marginal de NWIFEINC dado todo lo demas constante y en la media
+. gen gprobit2= normalden(_b[nwifeinc]*nwifeinc + _b[educ]*m2 + _b[exper]*m3 + _b[expersq]*m4 + _b[age]*m5 + _b[kidslt6]*m6 + _b[kidsge6]*m7 + _b[_cons])
+
+. gen parcial2_p_nwifeinc= gprobit2*_b[nwifeinc]
+
+. scatter parcial2_p_nwifeinc nwifeinc //el efecto parcial (negativo) es menor en val abs cuando los ingresos están alejados de la media
+
+. sum parcial2_p_nwifeinc 
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+parcial2_p~c |       753   -.0046519    .0001089  -.0047968  -.0037376
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen EPsp6probit=normal(_b[nwifeinc]*20 + _b[educ]*12 + _b[exper]*8 + _b[expersq]*64 + _b[age]*32 + _b[kidslt6]*3 + _b[kidsge6]*0 + _b[_cons])- normal(_
+> b[nwifeinc]*20 + _b[educ]*12 + _b[exper]*8 + _b[expersq]*64 + _b[age]*32 + _b[kidslt6]*1 + _b[kidsge6]*0 + _b[_cons])
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. sum EPsp6probit
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+ EPsp6probit |       753   -.4292536           0  -.4292536  -.4292536
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. logit inlf $lista       
+
+Iteration 0:   log likelihood =  -514.8732  
+Iteration 1:   log likelihood = -402.38502  
+Iteration 2:   log likelihood = -401.76569  
+Iteration 3:   log likelihood = -401.76515  
+Iteration 4:   log likelihood = -401.76515  
+
+Logistic regression                               Number of obs   =        753
+                                                  LR chi2(7)      =     226.22
+                                                  Prob > chi2     =     0.0000
+Log likelihood = -401.76515                       Pseudo R2       =     0.2197
+
+------------------------------------------------------------------------------
+        inlf |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |  -.0213452   .0084214    -2.53   0.011    -.0378509   -.0048394
+        educ |   .2211704   .0434396     5.09   0.000     .1360303    .3063105
+       exper |   .2058695   .0320569     6.42   0.000     .1430391    .2686999
+     expersq |  -.0031541   .0010161    -3.10   0.002    -.0051456   -.0011626
+         age |  -.0880244    .014573    -6.04   0.000     -.116587   -.0594618
+     kidslt6 |  -1.443354   .2035849    -7.09   0.000    -1.842373   -1.044335
+     kidsge6 |   .0601122   .0747897     0.80   0.422     -.086473    .2066974
+       _cons |   .4254524   .8603697     0.49   0.621    -1.260841    2.111746
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se guardan los valores ajustados en una variable prMPL (predicción de la probabilidad de cada individuo)
+. predict prLOGIT
+(option pr assumed; Pr(inlf))
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Predicciones de INLF utilizando como valor de corte la proporción muestral de unos    
+. g UNOL=(prLOGIT>propunos)       
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab  inlf UNOL, col
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+  =1 if in |
+ lab frce, |         UNOL
+      1975 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       233         92 |       325 
+           |     68.53      22.28 |     43.16 
+-----------+----------------------+----------
+         1 |       107        321 |       428 
+           |     31.47      77.72 |     56.84 
+-----------+----------------------+----------
+     Total |       340        413 |       753 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Predicciones de INLF utilizando como valor de corte 0,5
+. g UNOL2=(prLOGIT>0.5)   
+
+. * BONDAD DE AJUSTE: Tabla de proporción de 0 y 1 correctos
+. tab  inlf UNOL2, col    
+
++-------------------+
+| Key               |
+|-------------------|
+|     frequency     |
+| column percentage |
++-------------------+
+
+  =1 if in |
+ lab frce, |         UNOL2
+      1975 |         0          1 |     Total
+-----------+----------------------+----------
+         0 |       207        118 |       325 
+           |     71.88      25.38 |     43.16 
+-----------+----------------------+----------
+         1 |        81        347 |       428 
+           |     28.13      74.62 |     56.84 
+-----------+----------------------+----------
+     Total |       288        465 |       753 
+           |    100.00     100.00 |    100.00 
+
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Comando de Stata que calcula proporción de predicciones correctas
+. * 1. Valor por defecto de STATA: 0.5
+. estat class
+
+Logistic model for inlf
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       347           118  |        465
+     -     |        81           207  |        288
+-----------+--------------------------+-----------
+   Total   |       428           325  |        753
+
+Classified + if predicted Pr(D) >= .5
+True D defined as inlf != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   81.07%
+Specificity                     Pr( -|~D)   63.69%
+Positive predictive value       Pr( D| +)   74.62%
+Negative predictive value       Pr(~D| -)   71.88%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   36.31%
+False - rate for true D         Pr( -| D)   18.93%
+False + rate for classified +   Pr(~D| +)   25.38%
+False - rate for classified -   Pr( D| -)   28.13%
+--------------------------------------------------
+Correctly classified                        73.57%
+--------------------------------------------------
+
+. * 2. Usando proporción de unos en la muestra
+. sum propunos    
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+    propunos |       753    .5683931           0   .5683931   .5683931
+
+. local propunos=r(mean)
+
+. estat class, cutoff(`propunos')
+
+Logistic model for inlf
+
+              -------- True --------
+Classified |         D            ~D  |      Total
+-----------+--------------------------+-----------
+     +     |       321            92  |        413
+     -     |       107           233  |        340
+-----------+--------------------------+-----------
+   Total   |       428           325  |        753
+
+Classified + if predicted Pr(D) >= .5683931
+True D defined as inlf != 0
+--------------------------------------------------
+Sensitivity                     Pr( +| D)   75.00%
+Specificity                     Pr( -|~D)   71.69%
+Positive predictive value       Pr( D| +)   77.72%
+Negative predictive value       Pr(~D| -)   68.53%
+--------------------------------------------------
+False + rate for true ~D        Pr( +|~D)   28.31%
+False - rate for true D         Pr( -| D)   25.00%
+False + rate for classified +   Pr(~D| +)   22.28%
+False - rate for classified -   Pr( D| -)   31.47%
+--------------------------------------------------
+Correctly classified                        73.57%
+--------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * CÁLCULO MANUAL
+. * EFECTO PARCIAL DEL INGRESO DEL RESTO DE LOS MIEMBROS DEL HOGAR
+. g glogit=prLOGIT*(1-prLOGIT)    
+
+. g EFNWl=glogit*_b[nwifeinc]     
+
+. tabstat EFNWl, s(mean p10 p25 p50 p75 p90)      
+
+    variable |      mean       p10       p25       p50       p75       p90
+-------------+------------------------------------------------------------
+       EFNWl | -.0038118  -.005272 -.0050044 -.0041008 -.0028521 -.0017456
+--------------------------------------------------------------------------
+
+. tabstat EFNWl, by(quint_ingre) s(mean)
+
+Summary for variables: EFNWl
+     by categories of: quint_ingre (5 quantiles of nwifeinc)
+
+quint_ingre |      mean
+------------+----------
+          1 | -.0036061
+          2 | -.0037341
+          3 | -.0036777
+          4 |  -.004084
+          5 | -.0039569
+------------+----------
+      Total | -.0038118
+-----------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Para replicar el efecto parcial de NWIFEINC en el vector de medias
+. gen glogit2=1/(1+exp(-(_b[nwifeinc]*m1+_b[educ]*m2+_b[exper]*m3+_b[expersq]*m4+_b[age]*m5+_b[kidslt6]*m6+_b[kidsge6]*m7+_b[_cons])))
+
+. gen efp_nwifeinc2= glogit2*(1-glogit2)*_b[nwifeinc]
+
+. sum efp_nwifeinc2 //coincide con lo obtenido con el comando "mfx"
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+efp_nwifei~2 |       753   -.0051901           0  -.0051901  -.0051901
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Para ver el efecto parcial de NWIFEINC dado todo lo demás constante y en la media
+. gen glogit3=1/(1+exp(-(_b[nwifeinc]*nwifeinc+_b[educ]*m2+_b[exper]*m3+_b[expersq]*m4+_b[age]*m5+_b[kidslt6]*m6+_b[kidsge6]*m7+_b[_cons])))
+
+. gen efp_nwifeinc3= glogit3*(1-glogit3)*_b[nwifeinc]
+
+. scatter efp_nwifeinc3 nwifeinc
+
+. sum efp_nwifeinc3
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+efp_nwifei~3 |       753   -.0051159    .0001746  -.0053363  -.0036225
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Efecto parcial de la educ con el resto de las variables en la media
+. gen glogit4=1/(1+exp(-(_b[nwifeinc]*m1+_b[educ]*educ+_b[exper]*m3+_b[expersq]*m4+_b[age]*m5+_b[kidslt6]*m6+_b[kidsge6]*m7+_b[_cons])))
+
+. gen efp_educ= glogit4*(1-glogit4)*_b[educ]
+
+. scatter efp_educ educ
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. gen EPsp6logit=1/(1+exp(-(_b[nwifeinc]*20 + _b[educ]*12 + _b[exper]*8 + _b[expersq]*64 + _b[age]*32 + _b[kidslt6]*3 + _b[kidsge6]*0 + _b[_cons])))- 1/(
+> 1+exp(-(_b[nwifeinc]*20 + _b[educ]*12 + _b[exper]*8 + _b[expersq]*64 + _b[age]*32 + _b[kidslt6]*1 + _b[kidsge6]*0 + _b[_cons])))
+
+. sum EPsp6logit
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+  EPsp6logit |       753   -.4142233           0  -.4142233  -.4142233
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * CONTRASTES DE SIGNIFICACION CONJUNTA (CONTRASTES DE EXCLUSION)
+. test kidslt6 kidsge6
+
+ ( 1)  [inlf]kidslt6 = 0
+ ( 2)  [inlf]kidsge6 = 0
+
+           chi2(  2) =   53.54
+         Prob > chi2 =    0.0000
+
+. test nwifeinc educ exper expersq
+
+ ( 1)  [inlf]nwifeinc = 0
+ ( 2)  [inlf]educ = 0
+ ( 3)  [inlf]exper = 0
+ ( 4)  [inlf]expersq = 0
+
+           chi2(  4) =  118.92
+         Prob > chi2 =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * COMPARACION EFECTO PARCIAL INGRESO RESTO DEL HOGAR EN LOS DISTINTOS MODELOS
+. tabstat EF*, s(p10 p25 p50 p75 p90) 
+
+   stats |   EFNWmpl     EFNWp     EFNWl
+---------+------------------------------
+     p10 | -.0034052  -.004755  -.005272
+     p25 | -.0034052 -.0045894 -.0050044
+     p50 | -.0034052 -.0039429 -.0041008
+     p75 | -.0034052 -.0029055 -.0028521
+     p90 | -.0034052 -.0018186 -.0017456
+----------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * COMPARACION PROBABILIDADES PREDICHAS SEGUN CANTIDAD DE HIJOS MENORES DE 6 AÑOS        
+. tabstat pr* inlf, by(kidslt6)   
+
+Summary statistics: mean
+  by categories of: kidslt6 (# kids < 6 years)
+
+ kidslt6 |  propunos     prMPL  prPROBIT   prLOGIT      inlf
+---------+--------------------------------------------------
+       0 |  .5683931  .6175964  .6211553  .6191017  .6188119
+       1 |  .5683931  .3971497  .3885021  .3874112  .3898305
+       2 |  .5683931  .2877857  .2688965   .270924  .2692308
+       3 |  .5683931 -.2031691  .0124624  .0219365         0
+---------+--------------------------------------------------
+   Total |  .5683931  .5683931   .570109  .5683931  .5683931
+------------------------------------------------------------
+
+. 
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * COMPARACION UNOS Y CEROS PREDICHOS SEGUN CANTIDAD DE HIJOS MENORES DE 6 AÑOS
+. tabstat UNO* inlf, by(kidslt6)  
+
+Summary statistics: mean
+  by categories of: kidslt6 (# kids < 6 years)
+
+ kidslt6 |    UNOMPL   UNOMPL2      UNOP     UNOP2      UNOL     UNOL2      inlf
+---------+----------------------------------------------------------------------
+       0 |  .6072607  .7046205  .6336634  .7029703  .6320132    .69967  .6188119
+       1 |  .2033898  .3559322  .2372881  .3305085  .2372881  .3220339  .3898305
+       2 |  .0384615  .1153846  .0769231  .1153846  .0769231  .1153846  .2692308
+       3 |         0         0         0         0         0         0         0
+---------+----------------------------------------------------------------------
+   Total |  .5219124   .626826  .5498008  .6215139  .5484728  .6175299  .5683931
+--------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * COMPARACION EFECTO PARCIAL DEL Se Pide 6
+. tabstat EPsp6*
+
+   stats |  EPsp6mpl  EPsp6p~t  EPsp6l~t
+---------+------------------------------
+    mean |  -.523621 -.4292536 -.4142233
+----------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se limpia y configura la memoria
+. capture clear all
+
+. set memory 80m  
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are performed on the fly automatically.
+
+. set more off
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se establece global con ruta de la carpeta de trabajo
+. global ruta "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 5 - Modelos binarios"
+
+. 
+end of do-file
+
+. do "C:\Users\DACZA_~1\AppData\Local\Temp\STD00000000.tmp"
+
+. * Se cierra cualquier archivo log abierto y se abre un nuevo log
+. capture log close

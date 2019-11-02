@@ -1,0 +1,151 @@
+
+open "C:\Archivos de programa\gretl\data\wooldridge\fertil3.gdt"
+setobs 1 1913 --time-series
+
+#Graficar gfr y pe y analizar comparativamente su evolución
+gnuplot gfr --with-lines --time-series
+gnuplot pe --with-lines --time-series
+
+
+# Especificar y estimar un modelo estático para gfr en función de pe
+#incluyendo constante.
+ols gfr const pe
+
+#salva los residuos a la ventana princiapal en la variable uhat
+series uhat = $uhat
+corrgm uhat 14
+
+# Calcule los multiplicadores de corto plazo y de largo
+#plazo para este modelo
+scalar MCP=$coeff(pe)
+scalar MLP=$coeff(pe)
+
+#En este caso MCP y MLP coinciden
+ 
+#salva la serie de valores predichos a la variable yhat
+series yhat = $yhat
+
+#Graficar la variable dependiente y la ajustada
+#para analizar la bondad de ajuste del modelo.
+gnuplot gfr yhat --with-lines --time-series
+
+
+#Graficar los residuos en el tiempo
+gnuplot uhat --with-lines --time-series
+
+#Incluir las 2 variables ficticias, ww2 y pill en el modelo anterior
+ols gfr const pe ww2 pill
+#Calcule los multiplicadores de corto plazo y de largo
+#plazo para este modelo
+scalar MCP4=$coeff(pe)
+
+series yhat4 = $yhat
+gnuplot gfr yhat4 --with-lines --time-series
+#Graficar los residuos
+series uhat4 = $uhat
+gnuplot uhat4 --with-lines --time-series
+# modelo 6
+ols gfr const pe ww2 pill --robust
+# Si el problema de autocorrelación de los residuos se debe a un proceso
+#AR(1) en la perturbación, estímelo de manera de obtener las propiedades
+#de insesgamiento y consistencia en los estimadores. Analice
+ar1 gfr const pe ww2 pill
+#Por defecto usa el método de Cochrane-Orcutt
+
+#Salvamos los residuos y las estimaciones de la variable dependiente
+series yhat7 = $yhat
+series uhat7 = $uhat
+
+#graficamos la variable dependiente y las estimaciones del modelo
+gnuplot gfr yhat7 --with-lines --time-series
+#graficamos los residuos
+gnuplot uhat7 --with-lines --time-series
+
+# Obtenemos los multiplicadores de corto y largo plazo
+scalar MCP=$coeff(pe)
+scalar MLP=$coeff(pe)
+# Regrese gfr respecto a una constante, pe contemporánea y 4 retardos, ww2 y pill
+ols gfr const pe ww2 pill pe_1 pe_2 pe_3 pe_4
+
+#¿Son válidas las estimaciones de las desviaciones típicas de los coeficientes? 
+#En caso contrario re-estime adecuadamente
+
+#Estimamos el modelo con desviaciones típicas corregidas por AC (HAC)
+ols gfr const pe ww2 pill pe_1 pe_2 pe_3 pe_4 --robust
+#Obtenemos los multiplicadores
+scalar MCP8=$coeff(pe)
+scalar MLP8=$coeff(pe)+$coeff(pe_1)+$coeff(pe_2)+$coeff(pe_3)+$coeff(pe_4)
+
+#Realice un test secuencial de omisión de retardos
+omit --auto=0.05
+
+#Es probable que pe esté correlacionada con sus retardos
+corr pe pe_2 pe_3 pe_4
+
+#Incorporamos retardos de la variable dependiente
+ols gfr const pe pill ww2 gfr_1 
+
+#Obtenemos el multiplicador de CP
+scalar MCP10=$coeff(pe)
+
+#Ahora la expresión del multiplicador de LP es distinta:
+scalar MLP10=$coeff(pe)/(1-$coeff(gfr_1))
+
+#graficamos los residuos
+series uhat10 = $uhat
+gnuplot uhat10 --with-lines --time-series
+
+series yhat10 = $yhat
+gnuplot yhat10 --with-lines --time-series
+
+#Considere un modelo en el que se incluyen 4 retardos de pe y 1 retardo de
+# gfr como regresores, además de la constante y las 2 variables binarias.
+
+ols gfr const pe  pe_1 pe_2 pe_3 pe_4 pill ww2 gfr_1
+
+#graficamos los residuos
+series uhat11 = $uhat
+gnuplot uhat11 --with-lines --time-series
+#vemos su correlograma
+corrgm uhat11 14
+
+
+series yhat11 = $yhat
+gnuplot yhat11 --with-lines --time-series
+
+#Obtenemos el multiplicador de CP
+scalar MCP12=$coeff(pe)
+#Y el de largo
+scalar MLP12=($coeff(pe)+$coeff(pe_1)+$coeff(pe_2)+$coeff(pe_3)+$coeff(pe_4))/(1-$coeff(gfr_1))
+
+
+#Para mejorar el modelo en 12) realice una eliminación secuencial 
+#de los coeficientes no significativos al 5%.
+omit --auto=0.05
+
+#El multiplicador de CP es 0 porque en este modelo PE no 
+#afecta gfr contemporánea
+
+
+#Y el de largo
+scalar MLP13=($coeff(pe_2)+$coeff(pe_3))/(1-$coeff(gfr_1))
+
+#Suponga una estructura geométrica en los retardos y estime 
+#un modelo para gfr respecto a una constante y a infinitos
+#retardos de pe
+
+ols gfr const pe gfr_1
+series uhat14 = $uhat
+corrgm uhat14 14
+
+#Los residuos de la regresión anterior están autocorrelacionados,
+#por lo que estimamos por Cochrane-Orcutt
+ar1 gfr const pe gfr_1
+
+series uhat14i = $uhat
+corrgm uhat14i 14
+
+#Obtenemos los multiplicadores
+scalar MCP14=$coeff(pe)
+scalar MLP14=($coeff(pe))/(1-$coeff(gfr_1))
+

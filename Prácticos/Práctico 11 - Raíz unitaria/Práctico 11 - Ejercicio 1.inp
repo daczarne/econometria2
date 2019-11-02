@@ -1,0 +1,79 @@
+###################################
+#### PRÁCTICO 11 - EJERCICIO 1 ####
+###################################
+
+#### PARTE a ####
+
+nulldata 300
+setobs 1 1950 --time-series
+set seed 12345
+genr BLANCO = randgen(N,0,1)
+
+
+#### PARTE b ####
+
+genr X=0*const
+genr X=X(-1)+BLANCO
+
+plotX <- gnuplot X --with-lines --time-series
+plotX.show
+
+corrgm X 24 --plot=display
+
+# Se diferencia la serie Xt
+
+diff X
+
+plotdX <- gnuplot d_X --with-lines --time-series
+plotdX.show
+
+corrgm d_X 24 --plot=display
+
+#### PARTE c ####
+
+genr Y=0*const
+genr Y=0.3+Y(-1)+BLANCO
+
+plotY <- gnuplot Y --with-lines --time-series
+plotY.show
+
+corrgm Y 24 --plot=display
+
+# Se diferencia la serie Yt
+
+diff Y
+
+plotdY <- gnuplot d_Y --with-lines --time-series
+plotdY.show
+
+corrgm d_Y 24 --plot=display
+
+#### PARTE d ####
+
+genr Z=0*const
+genr Z=2*Z(-1)-Z(-2)+BLANCO
+
+plotZ <- gnuplot Z --with-lines --time-series
+plotZ.show
+
+corrgm Z 24 --plot=display
+
+# Contraste ADF para la serie en niveles
+
+adf 10 Z --nc --c --ct --verbose --test-down # Conclusión: existe al menos una raíz unitaria
+
+scalar norm=qnorm(0.05)
+
+# Se diferencia la serie
+
+diff Z
+
+adf 10 d_Z --nc --c --ct --verbose --test-down # Conslusión: existen al menos dos raíces unitarias
+
+# Se testea ADF sobre las segundas diferencias. Se utiliza el modelo A
+
+adf 10 d_Z --nc --c --ct --difference --verbose --test-down # Conslusión: no existe evidencia de una tercera RU
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################

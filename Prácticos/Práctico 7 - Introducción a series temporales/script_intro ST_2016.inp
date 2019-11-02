@@ -1,0 +1,84 @@
+# Entrar a herramientas -> historial de instrucciones
+
+# Comienza el historial 
+# Registro de las instrucciones de la sesión.  Por favor, tenga en
+# cuenta que probablemente necesitará editar este guion antes
+# de ejecutarlo.
+
+###1 Importe los datos en el programa Gretl
+open "C:\Users\Dropbox\econometriaII\PIB_1900_2015.xls"
+setobs 1 1900 --time-series
+delete 1
+
+###2 
+# Calculo el logaritmo del PIB (l_PIB)
+logs PIB
+# Grafico evolución de PIB y l_PIB a través del tiempo
+gnuplot l_PIB PIB --with-lines --time-series --output="C:\Users\Dropbox\econometriaII\pib_lpib.plt"
+#Herramientas->Gnuplot y abrir el gŕafico 
+
+###3 
+# Genere una variable “tendencia lineal” para el período muestral. 
+genr time
+
+#Estime un modelo de tendencia lineal para l_PIB y guarde residuos
+ols l_PIB const time 
+#Guardo los residuos
+series l_PIB_detrended = $uhat
+#Guardo la serie l_PIB estimada
+series l_PIB_hat = $yhat
+
+#a beta1=0.0263869 -> tasa de crecimiento promedio anual
+#b Grafico l_PIB y l_PIB_hat
+gnuplot l_PIB l_PIB_hat --with-lines --time-series --output="C:\Users\Dropbox\econometriaII\lpib_lpibhat.plt"
+
+#gráfico residuos (no lo pide)
+gnuplot l_PIB_detrended --with-lines --time-series --output="C:\Users\Dropbox\econometriaII\lpib_detr.plt"
+
+###
+ols l_PIB_detrended const l_PIB_detrended(-1)
+# coeficiente rho = 0.903545 
+
+###5
+#Durbin-Watson (DW) para autocorrelación de residuos.
+square l_PIB_detrended
+genr suma=l_PIB_detrended-l_PIB_detrended(-1)
+square suma
+genr DW=sum(sq_suma)*sum(sq_l_PIB_detrended)^-1
+#DW = 0.191774
+#en el modelo Durbin-Watson=0.191774
+
+#Calculo el DW con la aprox DW =~ 2*(1-rho)
+scalar DWaprox=2*(1-0.903545) 
+
+###6
+#primera diferencia de l_PIB (d_l_PIB)
+diff l_PIB
+
+gnuplot d_l_PIB --with-lines --time-series --output="C:\Users\Dropbox\econometriaII\d_lpib.plt"
+
+###7
+#Modelo lineal sólo con constante para d_l_PIB
+ols d_l_PIB const
+#constante = 0.0271297
+#valor estimado beta1=0.0263869
+
+#Grafique dicha constante y los valores de la variable dependiente.
+series constante = $yhat
+gnuplot d_l_PIB constante --with-lines --time-series --output="C:\Users\Dropbox\econometriaII\d_lpib_cte.plt"
+
+#Obtenga los residuos del modelo y grafíquelos
+series residuos = $uhat
+gnuplot residuos --with-lines --time-series --output="C:\Users\Dropbox\econometriaII\residuos.plt"
+
+#Presentan autocorrelación? 
+#puedo mirar el DW del modelo = 1.438284 (rho=0.280091)
+
+###8
+
+# Modelo lineal para la variable dependiente d_l_PIB con cte y retardo
+ols d_l_PIB const d_l_PIB(-1)
+# pendiente = 0.280085
+# coef de vble dep rezagada =~ rho del modelo anterior 0.280091
+
+# no se puede hacer DW

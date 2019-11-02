@@ -1,0 +1,61 @@
+##################################
+#### PRÁCTICO 7 - EJERCICIO 2 ####
+##################################
+
+#### Parte 1 ####
+
+open "G:\UdelaR\CCEEA\Semestre 7\Econometría II\Prácticos\Práctico 7 - Introducción a series temporales\ipcims.dta"
+
+#### Parte 2 ####
+
+genr l_IMS = log(ims)
+
+lims <- gnuplot l_IMS --with-lines --time-series
+lims.show
+
+#### Parte 3 ####
+
+diff l_IMS
+
+dlims <- gnuplot d_l_IMS --with-lines --time-series
+dlims.show
+
+#### Parte 4 ####
+
+M1 <- ols d_l_IMS const
+
+G1 <- gnuplot d_l_IMS --with-lines --time-series # La constante se la agregué manualmente porque no encuentro el comando
+G1.show
+
+genr resi=$uhat
+
+G2 <- gnuplot resi --time-series --with-lines
+G2.show
+
+G3 <- gnuplot d_l_IMS resi --time-series --with-lines --single-yaxis
+G3.show
+
+#### Parte 5 ###
+
+# d) Estimación del modelo
+
+M2 <- ols resi const resi(-1)
+
+scalar r2 = $rsq
+scalar n=$nobs
+scalar LM=r2*n
+scalar chi=critical(c, 1, 0.05)
+
+#### Parte 6 ###
+
+# Las dummies se agregaron manualmente porque no encontré el comando que lo haga
+
+M3 <- ols d_l_IMS const dm1 dm2 dm3 dm4 dm5 dm6 dm7 dm8 dm9 dm10 dm11
+
+genr resi2=$uhat
+
+DW <- ols resi2 const resi2(-1)
+
+################################
+#### FIN DE LA PROGRAMACIÓN ####
+################################
